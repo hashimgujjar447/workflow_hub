@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="welcome-container">
+        <div class="welcome-header">
+            <h1>Welcome to WorkflowHub! 👋</h1>
+            <p class="welcome-subtitle">Hello <strong>{{ user.first_name }} {{ user.last_name }}</strong>, great to see you today!</p>
+        </div>
+        
+        <div class="welcome-card">
+            <div class="welcome-icon">✨</div>
+            <div class="welcome-content">
+                <h2>Ready to get things done?</h2>
+                <p>Manage your projects, tasks, and collaborate with your team all in one place.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

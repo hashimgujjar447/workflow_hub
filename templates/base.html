@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>Document</title>
+</head>
+<body>
+
+    <header class="topbar">
+        <button class="open_sidebar">☰</button>
+        <h1>WorkflowHub</h1>
+    </header>
+
+    <main class="app_layout">
+
+        <aside class="sidebar">
+            <button class="close_sidebar">✖</button>
+            <h2>Menu</h2>
+
+            <nav>
+                <a href="#">Dashboard</a>
+                <a href="#">Workspaces</a>
+                <a href="#">Projects</a>
+                <a href="#">Tasks</a>
+            </nav>
+        </aside>
+
+        <section class="main_content_section">
+            {% block content %}
+            
+            {% endblock %}
+        </section>
+
+    </main>
+    
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>
