@@ -1,29 +1,69 @@
-{% extends 'base.html' %} {% block content %}
-<h1>Hello, {{ user.first_name }} {{ user.last_name }}</h1>
-<div class="workspace_create_div">
-  <a href="{% url 'create_workspace' %}">Create Workspace</a>
-</div>
-<div class="line"></div>
-<div>
-  <h2>Your Workspaces</h2>
-  <div class="workspace_cards">
-    {% if all_workspaces %}
-
-    {% for workspace in all_workspaces %}
-        <div class="workspace_card">
-     <div class="workspace_card_desc">
-         <h3>{{ workspace.name }}</h3>
-      <hr />
-      <h3>projects 4</h3>
-     </div>
-      <div class="workspace_card_bottom">
-        <p>members</p>
-      </div>
+{% extends 'base.html' %} 
+{% block content %}
+<div class="workspaces-page">
+  <div class="page-header">
+    <div>
+      <h1>Welcome back, {{ user.first_name }} {{ user.last_name }}! 👋</h1>
+      <p>Manage your workspaces and collaborate with your team</p>
     </div>
-    {% endfor %}
+    <div class="workspace_create_div">
+      <a href="{% url 'create_workspace' %}" class="btn btn-primary">
+        <span>➕</span> Create Workspace
+      </a>
+    </div>
+  </div>
 
+  <div class="workspaces-section">
+    <h2 class="section-title">Your Workspaces</h2>
+    
+    {% if all_workspaces %}
+    <div class="workspace_cards">
+      {% for workspace in all_workspaces %}
+      <div class="workspace_card">
+        <div class="workspace_card_header">
+          <div class="workspace_icon">🏢</div>
+          <div class="workspace_menu">⋮</div>
+        </div>
+        
+        <div class="workspace_card_body">
+          <h3 class="workspace_name">{{ workspace.name }}</h3>
+          <p class="workspace_description">{{ workspace.description|default:"No description available" }}</p>
+        </div>
+        
+        <div class="workspace_card_stats">
+          <div class="stat_item">
+            <div class="stat_content">
+              <span class="stat_icon">📁</span>
+              <span class="stat_value">4</span>
+            </div>
+            <span class="stat_label">Projects</span>
+          </div>
+          <div class="stat_divider"></div>
+          <div class="stat_item">
+            <div class="stat_content">
+              <span class="stat_icon">👥</span>
+              <span class="stat_value">{{ workspace.members.count|default:"0" }}</span>
+            </div>
+            <span class="stat_label">Members</span>
+          </div>
+        </div>
+        
+        <div class="workspace_card_footer">
+          <a href="#" class="workspace_link">Open Workspace →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📂</div>
+      <h3>No workspaces yet</h3>
+      <p>Create your first workspace to get started with your projects</p>
+      <a href="{% url 'create_workspace' %}" class="btn btn-primary" style="margin-top: 20px;">
+        <span>➕</span> Create Your First Workspace
+      </a>
+    </div>
     {% endif %}
-   
   </div>
 </div>
 {% endblock %}
