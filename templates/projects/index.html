@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="projects-page">
+    <div class="page-header">
+        <h1>Projects</h1>
+        <p>Manage and track your workspace projects</p>
+    </div>
+
+    <div class="workspace-selector-card">
+        <form method="POST" class="workspace-selector-form">
+            {% csrf_token %}
+            <div class="selector-group">
+                <label for="workspace_slug">Select Workspace</label>
+                <div class="selector-wrapper">
+                    <select name="workspace_slug" id="workspace_slug" class="workspace-select" required>
+                        <option value="">Choose a workspace to view projects</option>
+                        {% for workspace in workspaces %}
+                            <option value="{{ workspace.slug }}">{{ workspace.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">View Projects</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if projects %}
+    <div class="projects-section">
+        <h2 class="section-title">All Projects</h2>
+        <div class="projects-grid">
+            {% for p in projects %}
+            <div class="project-card">
+                <div class="project-card-header">
+                    <h3>{{ p.name }}</h3>
+                    <span class="project-badge">Active</span>
+                </div>
+                <div class="project-card-body">
+                    <p class="project-description">{{ p.description|default:"No description available" }}</p>
+                </div>
+                <div class="project-card-footer">
+                    <div class="project-stats">
+                        <span class="stat-item">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                            </svg>
+                            Tasks
+                        </span>
+                        <span class="stat-item">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                                <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                            Team
+                        </span>
+                    </div>
+                    <a href="#" class="project-link">View Details →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📁</div>
+        <h3>No Projects Yet</h3>
+        <p>Select a workspace above to view its projects</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

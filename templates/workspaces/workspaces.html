@@ -1,6 +1,29 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<h1>Hello, {{ user.first_name }} {{ user.last_name }}</h1>
+<div class="workspace_create_div">
+  <a href="{% url 'create_workspace' %}">Create Workspace</a>
+</div>
+<div class="line"></div>
+<div>
+  <h2>Your Workspaces</h2>
+  <div class="workspace_cards">
+    {% if all_workspaces %}
 
-{% block content %}
-    <h2>Dashboard</h2>
-    <p>This is content area of workspace</p>
+    {% for workspace in all_workspaces %}
+        <div class="workspace_card">
+     <div class="workspace_card_desc">
+         <h3>{{ workspace.name }}</h3>
+      <hr />
+      <h3>projects 4</h3>
+     </div>
+      <div class="workspace_card_bottom">
+        <p>members</p>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+   
+  </div>
+</div>
 {% endblock %}

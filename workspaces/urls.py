@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
 urlpatterns=[
-    path('',views.workspaces)
+    path('',views.workspaces,name="workspaces"),
+    path('create/',views.create_workspace,name="create_workspace")
 ]

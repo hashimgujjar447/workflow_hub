@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
     <title>Document</title>
 </head>
 <body>
@@ -21,9 +21,9 @@
             <h2>Menu</h2>
 
             <nav>
-                <a href="#">Dashboard</a>
-                <a href="#">Workspaces</a>
-                <a href="#">Projects</a>
+                <a href="{% url 'home' %}">Dashboard</a>
+                <a href="{% url 'workspaces' %}">Workspaces</a>
+                <a href="{% url 'projects' %}">Projects</a>
                 <a href="#">Tasks</a>
             </nav>
         </aside>
