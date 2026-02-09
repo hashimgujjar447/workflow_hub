@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="detail-page">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{% url 'workspaces' %}">Workspaces</a>
+        <span class="separator">/</span>
+        <a href="{% url 'workspace_detail' workspace.slug %}">{{ workspace.name }}</a>
+        <span class="separator">/</span>
+        <span class="current">{{ project.name }}</span>
+    </div>
+
+    <!-- Project Header -->
+    <div class="detail-header">
+        <div class="header-left">
+            <div class="project-icon-large">📁</div>
+            <div class="header-info">
+                <h1>{{ project.name }}</h1>
+                <p class="project-meta">
+                    Created by <strong>{{ project.created_by.first_name }} {{ project.created_by.last_name }}</strong> 
+                    on {{ project.created_at|date:"F d, Y" }}
+                </p>
+                <div class="status-badges">
+                    <span class="badge badge-status-{{ project.status }}">
+                        {% if project.status == 'pending' %}⏳{% elif project.status == 'in_progress' %}🔄{% elif project.status == 'completed' %}✅{% else %}❌{% endif %}
+                        {{ project.get_status_display }}
+                    </span>
+                    {% if project.is_active %}
+                        <span class="badge badge-success">🟢 Active</span>
+                    {% else %}
+                        <span class="badge badge-inactive">⚫ Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary">⚙️ Settings</button>
+            <button class="btn btn-primary">➕ Add Task</button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3>{{ total_members }}</h3>
+                <p>Team Members</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>{{ total_tasks }}</h3>
+                <p>Total Tasks</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+                <h3>{{ completed_tasks }}</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🔄</div>
+            <div class="stat-content">
+                <h3>{{ in_progress_tasks }}</h3>
+                <p>In Progress</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+        <div class="progress-header">
+            <h3>Project Progress</h3>
+            <span class="progress-percentage">
+                {% if total_tasks > 0 %}
+                    {% widthratio completed_tasks total_tasks 100 %}%
+                {% else %}
+                    0%
+                {% endif %}
+            </span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {% if total_tasks > 0 %}{% widthratio completed_tasks total_tasks 100 %}%{% else %}0%{% endif %}"></div>
+        </div>
+        <div class="progress-labels">
+            <span>📝 To Do: {{ todo_tasks }}</span>
+            <span>🔄 In Progress: {{ in_progress_tasks }}</span>
+            <span>✅ Completed: {{ completed_tasks }}</span>
+        </div>
+    </div>
+
+    <!-- Team Members Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>👥 Team Members ({{ total_members }})</h2>
+            <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug project.slug %}">+ Add Member</a>
+        </div>
+        
+        {% if members %}
+        <div class="members-list">
+            {% for member in members %}
+            <div class="member-item">
+                <div class="member-avatar">{{ member.member.first_name|first }}{{ member.member.last_name|first }}</div>
+                <div class="member-info">
+                    <h4>{{ member.member.first_name }} {{ member.member.last_name }}</h4>
+                    <p class="member-email">{{ member.member.email }}</p>
+                </div>
+                <div class="member-role">
+                    <span class="role-badge role-{{ member.role }}">{{ member.get_role_display }}</span>
+                </div>
+                <div class="member-stats">
+                    <span class="task-count">{{ member.tasks.count }} tasks</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <p>No team members assigned. Add members to this project.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tasks Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>✅ Tasks ({{ total_tasks }})</h2>
+            <button class="btn btn-sm btn-primary">+ Add New Task</button>
+        </div>
+        
+        {% if tasks %}
+        <div class="tasks-container">
+            <!-- Task Filters -->
+            <div class="task-filters">
+                <button class="filter-btn active" data-filter="all">All ({{ total_tasks }})</button>
+                <button class="filter-btn" data-filter="todo">To Do ({{ todo_tasks }})</button>
+                <button class="filter-btn" data-filter="in_progress">In Progress ({{ in_progress_tasks }})</button>
+                <button class="filter-btn" data-filter="completed">Completed ({{ completed_tasks }})</button>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-list">
+                {% for task in tasks %}
+                <div class="task-item" data-status="{{ task.status }}">
+                    <div class="task-checkbox">
+                        {% if task.status == 'completed' %}
+                            <input type="checkbox" checked disabled>
+                        {% else %}
+                            <input type="checkbox">
+                        {% endif %}
+                    </div>
+                    <div class="task-content">
+                        <h4 class="task-title">{{ task.title }}</h4>
+                        {% if task.description %}
+                        <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        <div class="task-meta">
+                            {% if task.assigned_to %}
+                            <span class="task-assignee">
+                                👤 {{ task.assigned_to.member.first_name }} {{ task.assigned_to.member.last_name }}
+                            </span>
+                            {% else %}
+                            <span class="task-assignee">👤 Unassigned</span>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <span class="task-due-date">📅 {{ task.due_date|date:"M d, Y" }}</span>
+                            {% endif %}
+                            <span class="task-created">Created {{ task.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                    <div class="task-status">
+                        <span class="status-badge status-{{ task.status }}">
+                            {% if task.status == 'todo' %}📝
+                            {% elif task.status == 'in_progress' %}🔄
+                            {% elif task.status == 'review' %}👀
+                            {% elif task.status == 'completed' %}✅
+                            {% else %}❌{% endif %}
+                            {{ task.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn-icon" title="Edit">✏️</button>
+                        <button class="btn-icon" title="Delete">🗑️</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <div class="empty-icon">📝</div>
+            <h3>No Tasks Yet</h3>
+            <p>Create your first task to start tracking work on this project.</p>
+            <button class="btn btn-primary" style="margin-top: 16px;">➕ Create First Task</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

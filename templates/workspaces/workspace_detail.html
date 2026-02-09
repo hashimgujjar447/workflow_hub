@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="detail-page">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{% url 'workspaces' %}">Workspaces</a>
+        <span class="separator">/</span>
+        <span class="current">{{ workspace.name }}</span>
+    </div>
+
+    <!-- Workspace Header -->
+    <div class="detail-header">
+        <div class="header-left">
+            <div class="workspace-icon-large">🏢</div>
+            <div class="header-info">
+                <h1>{{ workspace.name }}</h1>
+                <p class="workspace-meta">
+                    Created by <strong>{{ workspace.creator.first_name }} {{ workspace.creator.last_name }}</strong> 
+                    on {{ workspace.created_at|date:"F d, Y" }}
+                </p>
+                <div class="status-badges">
+                    {% if workspace.is_active %}
+                        <span class="badge badge-success">🟢 Active</span>
+                    {% else %}
+                        <span class="badge badge-inactive">⚫ Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary">⚙️ Settings</button>
+            <button class="btn btn-primary">➕ Invite Members</button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3>{{ total_members }}</h3>
+                <p>Total Members</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-content">
+                <h3>{{ total_projects }}</h3>
+                <p>Total Projects</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+                <h3>{{ workspace.created_at|timesince }}</h3>
+                <p>Workspace Age</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <h3>{% if workspace.is_active %}Active{% else %}Inactive{% endif %}</h3>
+                <p>Status</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Members Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>👥 Workspace Members ({{ total_members }})</h2>
+            <button class="btn btn-sm btn-primary">+ Add Member</button>
+        </div>
+        
+        {% if members %}
+        <div class="members-list">
+            {% for member in members %}
+            <div class="member-item">
+                <div class="member-avatar">{{ member.user.first_name|first }}{{ member.user.last_name|first }}</div>
+                <div class="member-info">
+                    <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                    <p class="member-email">{{ member.user.email }}</p>
+                </div>
+                <div class="member-role">
+                    <span class="role-badge role-{{ member.role }}">{{ member.get_role_display }}</span>
+                </div>
+                <div class="member-meta">
+                    <span class="joined-date">Joined {{ member.joined_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <p>No members added yet. Invite team members to collaborate.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Projects Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <h2>📁 Projects ({{ total_projects }})</h2>
+            <button class="btn btn-sm btn-primary">+ Create Project</button>
+        </div>
+        
+        {% if projects %}
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card">
+                <div class="project-card-header">
+                    <h3>{{ project.name }}</h3>
+                    <span class="status-badge status-{{ project.status }}">
+                        {{ project.get_status_display }}
+                    </span>
+                </div>
+                <div class="project-card-body">
+                    <div class="project-meta">
+                        <span class="meta-item">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                            </svg>
+                            {{ project.tasks.count }} Tasks
+                        </span>
+                        <span class="meta-item">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                            {{ project.members.count }} Members
+                        </span>
+                    </div>
+                    <p class="project-date">Created {{ project.created_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="project-card-footer">
+                    <a href="{% url 'project_detail' workspace.slug project.slug %}" class="project-link">View Details →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <div class="empty-icon">📂</div>
+            <p>No projects yet. Create your first project to get started.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

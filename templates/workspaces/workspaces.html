@@ -18,7 +18,7 @@
     
     {% if all_workspaces %}
     <div class="workspace_cards">
-      {% for workspace in all_workspaces %}
+      {% for key,value in all_workspaces.items %}
       <div class="workspace_card">
         <div class="workspace_card_header">
           <div class="workspace_icon">🏢</div>
@@ -26,15 +26,15 @@
         </div>
         
         <div class="workspace_card_body">
-          <h3 class="workspace_name">{{ workspace.name }}</h3>
-          <p class="workspace_description">{{ workspace.description|default:"No description available" }}</p>
+          <h3 class="workspace_name">{{ value.workspace.name  }}</h3>
+          <p class="workspace_description">{{ value.workspace.description|default:"No description available" }}</p>
         </div>
         
         <div class="workspace_card_stats">
           <div class="stat_item">
             <div class="stat_content">
               <span class="stat_icon">📁</span>
-              <span class="stat_value">4</span>
+              <span class="stat_value">{{ value.projects }}</span>
             </div>
             <span class="stat_label">Projects</span>
           </div>
@@ -42,14 +42,14 @@
           <div class="stat_item">
             <div class="stat_content">
               <span class="stat_icon">👥</span>
-              <span class="stat_value">{{ workspace.members.count|default:"0" }}</span>
+              <span class="stat_value">{{ value.members.count|default:"0" }}</span>
             </div>
             <span class="stat_label">Members</span>
           </div>
         </div>
         
         <div class="workspace_card_footer">
-          <a href="#" class="workspace_link">Open Workspace →</a>
+          <a href="{% url 'workspace_detail' value.workspace.slug %}" class="workspace_link">Open Workspace →</a>
         </div>
       </div>
       {% endfor %}

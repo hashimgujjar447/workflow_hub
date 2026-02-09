@@ -33,6 +33,7 @@
             <div class="project-card">
                 <div class="project-card-header">
                     <h3>{{ p.name }}</h3>
+                
                     <span class="project-badge">Active</span>
                 </div>
                 <div class="project-card-body">
@@ -55,7 +56,7 @@
                             Team
                         </span>
                     </div>
-                    <a href="#" class="project-link">View Details →</a>
+                    <a href="{% url 'project_detail' p.workspace.slug  p.slug  %}" class="project-link">View Details →</a>
                 </div>
             </div>
             {% endfor %}
