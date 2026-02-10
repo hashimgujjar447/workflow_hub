@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>Create New Project</h2>
+        <p>Start a new project in your workspace</p>
+    </div>
+
+    <form class="workspace-form" method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name">Project Name <span class="required">*</span></label>
+            <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="form-input" 
+                placeholder="Enter project name"
+                required
+                maxlength="150"
+            >
+            <small class="form-hint">Choose a descriptive name for your project</small>
+        </div>
+
+     
+
+        <div class="form-group">
+            <label for="status">Project Status <span class="required">*</span></label>
+            <select id="status" name="status" class="form-input" required>
+                <option value="pending" selected>Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+            </select>
+            <small class="form-hint">Set the initial status of the project</small>
+        </div>
+
+        <div class="form-group">
+            <label for="is_active">Active Status <span class="required">*</span></label>
+            <select id="is_active" name="is_active" class="form-input" required>
+                <option value="true" selected>Active</option>
+                <option value="false">Inactive</option>
+            </select>
+            <small class="form-hint">Set whether the project is active or inactive</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Project</button>
+            <a href="{% url 'workspace_detail' workspace.slug %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

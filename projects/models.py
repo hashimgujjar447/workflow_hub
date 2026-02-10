@@ -43,6 +43,7 @@ class Project(models.Model):
         related_name='created_projects'
     )
 
+
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

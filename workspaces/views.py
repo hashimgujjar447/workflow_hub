@@ -4,6 +4,8 @@ from workspaces.models import Workspace, WorkspaceMember
 from accounts.models import Account
 from django.shortcuts import redirect
 from django.contrib import messages
+from projects.models import Project,ProjectMember
+from django.db import transaction
 # Create your views here.
 
 def workspaces(request):
@@ -117,3 +119,50 @@ def add_member_in_workspace(request,slug):
         'available_members':get_member
     }
     return render(request,'workspaces/add_member.html', context)
+
+
+
+def create_workspace_project(request, slug):
+    workspace = get_object_or_404(Workspace, slug=slug)
+
+    if request.method == "POST":
+        project_name = request.POST.get("name")
+        project_status = request.POST.get("status")
+        is_active = request.POST.get("is_active") == "true"
+
+        if not project_name:
+            messages.error(request, "Project ka naam zaroori hai.")
+            return redirect('workspace_detail', slug=workspace.slug)
+
+        if not workspace.members.filter(user=request.user).exists():
+            messages.error(request, "Aap is workspace ka hissa nahi hain.")
+            return redirect('workspace_detail', slug=workspace.slug)
+
+        if workspace.projects.filter(name__iexact=project_name).exists():
+            messages.error(
+                request,
+                "Is workspace mein isi naam ka project pehle se mojood hai."
+            )
+            return redirect('workspace_detail', slug=workspace.slug)
+
+        with transaction.atomic():
+            project = Project.objects.create(
+                workspace=workspace,
+                name=project_name,
+                slug=slugify(f"{workspace.slug}-{project_name}"),
+                status=project_status,
+                is_active=is_active
+            )
+
+            ProjectMember.objects.get_or_create(
+                project=project,
+                member=request.user,
+                defaults={"role": "manager"}
+            )
+
+        messages.success(request, "Project successfully add ho gaya 🎉")
+        return redirect('workspace_detail', slug=workspace.slug)
+
+    return render(request, 'projects/create_project.html', {
+        'workspace': workspace
+    })
