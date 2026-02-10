@@ -6,5 +6,6 @@ urlpatterns = [
    
     path('', views.projects, name="projects"),
     path('<slug:workspace_slug>/<slug:project_slug>/', views.project_detail, name="project_detail"),
-    path('<slug:workspace_slug>/<slug:project_slug>/add_new_member',views.add_member,name="add_member")
+    path('<slug:workspace_slug>/<slug:project_slug>/add_new_member',views.add_member,name="add_member"),
+    path('<slug:workspace_slug>/<slug:project_slug>/task/',include('tasks.urls'))
 ]

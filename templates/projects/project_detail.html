@@ -130,7 +130,7 @@
     <div class="section-card">
         <div class="section-header">
             <h2>✅ Tasks ({{ total_tasks }})</h2>
-            <button class="btn btn-sm btn-primary">+ Add New Task</button>
+            <a href="{% url 'add_project_task' workspace.slug project.slug %}" class="btn btn-sm btn-primary">+ Add New Task</a>
         </div>
         
         {% if tasks %}
