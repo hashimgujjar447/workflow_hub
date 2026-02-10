@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>Add New Member</h2>
+        <p>Add New Members to work on the project</p>
+    </div>
+
+    <form class="workspace-form" method="post">
+        {% csrf_token %}
+        
+        {% if available_members %}
+        <div class="form-group">
+            <label for="member">Select Member <span class="required">*</span></label>
+            <select name="member_id" id="member" class="form-input" required>
+                <option value="">Choose a member to add</option>
+                {% for m in available_members %}
+                    <option value="{{ m.id }}">{{ m.first_name }} {{ m.last_name }} ({{ m.email }})</option>
+                {% endfor %}
+            </select>
+            <p class="form-hint">Select a workspace member to add to this project</p>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role <span class="required">*</span></label>
+            <select name="role" id="role" class="form-input" required>
+                <option value="">Choose a role</option>
+                <option value="member">Manager</option>
+                <option value="leader">Leader</option>
+                <option value="frontend developer">Frontend Developer</option>
+                   <option value="backend developer">Backend Developer</option>
+                       <option value="seo">Seo</option>
+             
+            </select>
+            <p class="form-hint">Assign a role for this member in the project</p>
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <div class="empty-icon">👥</div>
+            <h3>No Available Members</h3>
+            <p>All workspace members are already part of this project.</p>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            {% if available_members %}
+                <button type="submit" class="btn btn-primary">Add Member</button>
+            {% endif %}
+            <a href="{% url 'workspace_detail' workspace.slug %}" class="btn btn-secondary">{% if available_members %}Cancel{% else %}Go Back{% endif %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

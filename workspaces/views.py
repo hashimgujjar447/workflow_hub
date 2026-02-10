@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from workspaces.models import Workspace, WorkspaceMember
-
+from accounts.models import Account
+from django.shortcuts import redirect
+from django.contrib import messages
 # Create your views here.
 
 def workspaces(request):
@@ -74,3 +76,44 @@ def workspace_detail(request, slug):
     }
     
     return render(request, 'workspaces/workspace_detail.html', context)
+
+def add_member_in_workspace(request,slug):
+    workspace = get_object_or_404(Workspace, slug=slug)
+
+    if request.method=="POST":
+        member_id = request.POST.get('member_id')
+        role = request.POST.get('role')
+
+        user=Account.objects.get(id=member_id)
+        if member_id and role:
+            try:
+                if not WorkspaceMember.objects.filter(workspace=workspace,user=user).exists():
+                    WorkspaceMember.objects.create(
+                        workspace=workspace,
+                        user=user,
+                        role=role
+                    )
+                    messages.success(request, f'{user.first_name} {user.last_name} has been added to the project.')
+                else:
+                    messages.warning(request, 'This member is already in the project.')
+            except Account.DoesNotExist:
+                messages.error(request, 'Selected user does not exist.')
+        return redirect('workspace_detail', slug=workspace.slug)
+
+    all_members=Account.objects.all()
+ 
+    which_members_are_in_workspace=workspace.members.all()
+    get_ids=[]
+    for m in which_members_are_in_workspace:
+        get_ids.append(m.user.id)
+
+    get_member=all_members.exclude(
+        id__in=get_ids
+    )
+    print(get_member)
+
+    context = {
+        'workspace': workspace,
+        'available_members':get_member
+    }
+    return render(request,'workspaces/add_member.html', context)
