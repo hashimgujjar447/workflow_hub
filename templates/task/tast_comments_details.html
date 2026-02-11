@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="comments-detail-page">
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-btn">
+        ← Back to Project
+    </a>
+
+    <!-- Task Header -->
+    <div class="task-header-card">
+        <div class="task-icon">📋</div>
+        <div class="task-header-info">
+            <h1>{{ task.title }}</h1>
+            {% if task.description %}
+            <p class="task-desc">{{ task.description|truncatewords:30 }}</p>
+            {% endif %}
+            <div class="task-badges">
+                <span class="badge badge-{{ task.status }}">{{ task.get_status_display }}</span>
+                {% if task.assigned_to %}
+                <span class="badge badge-assignee">👤 {{ task.assigned_to.member.first_name }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="all-comments-section">
+        <div class="comments-section-header">
+            <h2>💬 All Comments ({{ task.comments.count }})</h2>
+        </div>
+
+        <div class="comments-thread">
+            {% for c in task.comments.all %}
+                {% if not c.parent_comment %}
+                    {% include "task/comment_item.html" with comment=c is_reply=False %}
+                {% endif %}
+            {% empty %}
+                <div class="no-comments">
+                    <span class="no-comments-icon">💭</span>
+                    <p>No comments yet. Be the first to comment!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

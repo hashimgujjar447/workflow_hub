@@ -32,4 +32,4 @@ class TaskComment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Comment by {self.author} on {self.task}"
+        return f"Comment by {self.author} on {self.task} comment is {self.content}"

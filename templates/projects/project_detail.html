@@ -189,24 +189,41 @@
                         <button class="btn-icon" title="Delete">🗑️</button>
                     </div>
                 </div>
-                <div>
-              
-                     {% for comment in task.comments.all %}
-        
-        {% if not comment.parent_comment %}
-            
-            <p>{{ comment.content }}</p>
-
-            {% for reply in comment.replies.all %}
-                <div style="margin-left:20px;">
-                    {{ reply.content }}
-                </div>
-            {% endfor %}
-
-        {% endif %}
-
-    {% endfor %}
-
+                <!-- Comments Section -->
+                <div class="task-comments-section">
+                    {% with root_comments=task.comments.all|dictsort:"created_at" %}
+                    {% if root_comments %}
+                    <div class="comments-header">
+                        <span class="comments-count">💬 {{ task.comments.count }} Comments</span>
+                    </div>
+                    <div class="comments-list" id="comments-{{ task.id }}">
+                        {% for comment in root_comments %}
+                        {% if not comment.parent_comment %}
+                        <div class="comment-item {% if forloop.counter > 1 %}hidden-comment{% endif %}" data-visible="{% if forloop.counter <= 2 %}true{% else %}false{% endif %}">
+                            <div class="comment-avatar">{{ comment.user.first_name|first|upper }}{{ comment.user.last_name|first|upper }}</div>
+                            <div class="comment-body">
+                                <div class="comment-header">
+                                    <span class="comment-author">{{ comment.user.first_name }} {{ comment.user.last_name }}</span>
+                                    <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+                                </div>
+                                <p class="comment-content">{{ comment.content }}</p>
+                                
+                    
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    
+                    {% with total_root=task.comments.all|length %}
+                    {% if total_root > 1 %}
+                    <a href="{% url 'view_comment_details' workspace.slug project.slug task.id %}" class="view-all-comments-btn">
+                        👁️ View All {{ total_root }} Comments
+                    </a>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                    {% endwith %}
                 </div>
 
                 {% endfor %}
