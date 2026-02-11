@@ -144,7 +144,8 @@
             </div>
 
             <!-- Tasks List -->
-            <div class="tasks-list">
+            <div >
+               <div class="tasks-list"> 
                 {% for task in tasks %}
                 <div class="task-item" data-status="{{ task.status }}">
                     <div class="task-checkbox">
@@ -188,7 +189,31 @@
                         <button class="btn-icon" title="Delete">🗑️</button>
                     </div>
                 </div>
+                <div>
+              
+                     {% for comment in task.comments.all %}
+        
+        {% if not comment.parent_comment %}
+            
+            <p>{{ comment.content }}</p>
+
+            {% for reply in comment.replies.all %}
+                <div style="margin-left:20px;">
+                    {{ reply.content }}
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+    {% endfor %}
+
+                </div>
+
                 {% endfor %}
+                
+             
+            </div>
+            
             </div>
         </div>
         {% else %}

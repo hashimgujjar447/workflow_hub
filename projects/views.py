@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from workspaces.models import Workspace
 from .models import Project, ProjectMember
 from tasks.models import Task
+from comments.models import TaskComment
+from django.db.models import Prefetch
+
 
 def projects(request):
     workspaces = Workspace.objects.filter(creator=request.user)
@@ -36,8 +39,13 @@ def project_detail(request, workspace_slug, project_slug):
     
     # Get project belonging to this workspace
     project = get_object_or_404(
-        Project,
-        slug=project_slug,
+        Project.objects.prefetch_related(
+            Prefetch(
+                "tasks__comments",
+                 queryset=TaskComment.objects.select_related("parent_comment").prefetch_related("replies")
+            ),
+        ),
+         slug=project_slug,
         workspace=workspace
     )
     
@@ -46,6 +54,14 @@ def project_detail(request, workspace_slug, project_slug):
     
     # Get project tasks
     tasks = project.tasks.select_related('assigned_to__member', 'created_by').all()
+    for t in tasks:
+        for r in t.comments.all():
+            if r.parent_comment:
+                print(r.content)
+                print(r.replies.all())
+        
+    # Get all last 2 comments
+
     
     # Task statistics
     total_tasks = tasks.count()
@@ -65,7 +81,7 @@ def project_detail(request, workspace_slug, project_slug):
         'in_progress_tasks': in_progress_tasks,
         'todo_tasks': todo_tasks,
     }
-    print(context)
+   
     
     return render(request, 'projects/project_detail.html', context)
 
