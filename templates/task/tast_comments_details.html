@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="comments-detail-page">
+<div style="position: relative;" class="comments-detail-page">
     <!-- Back Button -->
-    <a href="javascript:history.back()" class="back-btn">
+   <div style="display: flex; justify-content: space-between; align-items: center;">
+     <a href="javascript:history.back()" class="back-btn">
         ← Back to Project
     </a>
+     <button  class="add-comment-btn back-btn">
+        Add New Comment
+    </button>
+    
+    
+   </div>
 
     <!-- Task Header -->
     <div class="task-header-card">
@@ -41,6 +48,36 @@
                     <p>No comments yet. Be the first to comment!</p>
                 </div>
             {% endfor %}
+        </div>
+    </div>
+    <!-- Add Comment Modal -->
+    <div class="add_comment_model">
+        <div class="comment-modal-content">
+            <div class="comment-modal-header">
+                <h2>💬 Add New Comment</h2>
+                <button type="button" class="close-modal-btn">&times;</button>
+            </div>
+            <form id="comment-form" method="POST" action="{% url 'view_comment_details' task.project.workspace.slug task.project.slug task.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="task_id" value="{{ task.id }}">
+                <input type="hidden" name="parent_comment_id" id="parent_comment_id" value="">
+                
+                <div class="form-group">
+                    <label for="comment-content">Your Comment</label>
+                    <textarea 
+                        name="content" 
+                        id="comment-content" 
+                        rows="5" 
+                        placeholder="Write your comment here..."
+                        required
+                    ></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn-submit">Post Comment</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
