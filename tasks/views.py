@@ -4,12 +4,15 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from workspaces.models import Workspace
 from projects.models import Project,ProjectMember
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+@login_required
 def get_all_tasks(request):
     get_all_my_tasks=Task.objects.filter(created_by=request.user)
     
 
+@login_required
 def add_task(request,workspace_slug,project_slug):
     print(project_slug,workspace_slug)
     workspace=get_object_or_404(

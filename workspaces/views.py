@@ -6,8 +6,10 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from projects.models import Project,ProjectMember
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+@login_required
 def workspaces(request):
     findAllWorkSpaces = Workspace.objects.filter(
     creator=request.user
@@ -34,6 +36,7 @@ def workspaces(request):
 
     return render(request,'workspaces/workspaces.html',context)
 
+@login_required
 def create_workspace(request):
     if request.method=="POST":
         name=request.POST.get("name")
@@ -60,6 +63,7 @@ def create_workspace(request):
     return render(request,'workspaces/create_workspace.html')
 
 
+@login_required
 def workspace_detail(request, slug):
     workspace = get_object_or_404(Workspace, slug=slug, creator=request.user)
     
@@ -79,6 +83,7 @@ def workspace_detail(request, slug):
     
     return render(request, 'workspaces/workspace_detail.html', context)
 
+@login_required
 def add_member_in_workspace(request,slug):
     workspace = get_object_or_404(Workspace, slug=slug)
 
@@ -122,6 +127,7 @@ def add_member_in_workspace(request,slug):
 
 
 
+@login_required
 def create_workspace_project(request, slug):
     workspace = get_object_or_404(Workspace, slug=slug)
 

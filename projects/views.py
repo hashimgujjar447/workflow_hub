@@ -4,8 +4,10 @@ from .models import Project, ProjectMember
 from tasks.models import Task
 from comments.models import TaskComment
 from django.db.models import Prefetch
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def projects(request):
     workspaces = Workspace.objects.filter(creator=request.user)
     selected_projects = None
@@ -28,6 +30,7 @@ def projects(request):
 
     return render(request, 'projects/index.html', context)
 
+@login_required
 def project_detail(request, workspace_slug, project_slug):
     
     # Get workspace and verify ownership
@@ -86,6 +89,7 @@ def project_detail(request, workspace_slug, project_slug):
     return render(request, 'projects/project_detail.html', context)
 
 
+@login_required
 def add_member(request, workspace_slug, project_slug):
     from django.contrib.auth import get_user_model
     from django.shortcuts import redirect

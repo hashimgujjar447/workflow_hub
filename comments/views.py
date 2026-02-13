@@ -7,9 +7,11 @@ from django.db.models import Prefetch
 from projects.models import Project,ProjectMember
 from django.http import HttpResponse
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def view_all_comments(request,workspace_slug,project_slug,id):
 
     
