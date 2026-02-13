@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="tasks-page">
+    <div class="page-header">
+        <div class="header-content">
+            <h1>📋 My Tasks</h1>
+            <p class="subtitle">Track and manage your work across all projects</p>
+        </div>
+    </div>
+
+    {% if all_data %}
+        {% for item in all_data %}
+        <div class="project-card">
+            <div class="project-card-header">
+                <div class="project-info">
+                    <div class="project-icon">{{ item.project.name|slice:":1" }}</div>
+                    <div>
+                        <h2>{{ item.project.name }}</h2>
+                        <span class="workspace-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            </svg>
+                            {{ item.project.workspace.name }}
+                        </span>
+                    </div>
+                </div>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-number">{{ item.assigned_tasks|length }}</span>
+                        <span class="stat-label">Assigned</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">{{ item.created_tasks|length }}</span>
+                        <span class="stat-label">Created</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tasks-grid">
+                <!-- Assigned Tasks -->
+                <div class="tasks-column assigned">
+                    <div class="column-header">
+                        <span class="column-icon">👤</span>
+                        <h3>Assigned to Me</h3>
+                    </div>
+                    
+                    {% if item.assigned_tasks %}
+                        {% for task in item.assigned_tasks %}
+                        <div class="task-card">
+                            <div class="task-card-top">
+                                <span class="status-badge status-{{ task.status }}">
+                                    {% if task.status == 'todo' %}📝{% elif task.status == 'in_progress' %}🔄{% elif task.status == 'review' %}👁️{% else %}✅{% endif %}
+                                    {{ task.get_status_display }}
+                                </span>
+                                {% if task.due_date %}
+                                <span class="due-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    {{ task.due_date|date:"M d" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h4 class="task-title">{{ task.title }}</h4>
+                            {% if task.description %}
+                            <p class="task-desc">{{ task.description|truncatewords:12 }}</p>
+                            {% endif %}
+                            <div class="task-footer">
+                                <div class="creator">
+                                    <div class="avatar">{{ task.created_by.first_name|slice:":1" }}</div>
+                                    <span>{{ task.created_by.first_name }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-column">
+                            <span class="empty-icon">🎉</span>
+                            <p>No tasks assigned!</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Created Tasks -->
+                <div class="tasks-column created">
+                    <div class="column-header">
+                        <span class="column-icon">✨</span>
+                        <h3>Created by Me</h3>
+                    </div>
+                    
+                    {% if item.created_tasks %}
+                        {% for task in item.created_tasks %}
+                        <div class="task-card">
+                            <div class="task-card-top">
+                                <span class="status-badge status-{{ task.status }}">
+                                    {% if task.status == 'todo' %}📝{% elif task.status == 'in_progress' %}🔄{% elif task.status == 'review' %}👁️{% else %}✅{% endif %}
+                                    {{ task.get_status_display }}
+                                </span>
+                                {% if task.due_date %}
+                                <span class="due-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    {{ task.due_date|date:"M d" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h4 class="task-title">{{ task.title }}</h4>
+                            {% if task.description %}
+                            <p class="task-desc">{{ task.description|truncatewords:12 }}</p>
+                            {% endif %}
+                            <div class="task-footer">
+                                {% if task.assigned_to %}
+                                <div class="assignee">
+                                    <div class="avatar assigned-avatar">{{ task.assigned_to.member.first_name|slice:":1" }}</div>
+                                    <span>{{ task.assigned_to.member.first_name }}</span>
+                                </div>
+                                {% else %}
+                                <span class="unassigned">Unassigned</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-column">
+                            <span class="empty-icon">📭</span>
+                            <p>No tasks created yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-illustration">🚀</div>
+            <h2>Welcome to Tasks!</h2>
+            <p>You're not part of any project yet. Join a project to start tracking tasks.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .tasks-page {
+        padding: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 40px;
+    }
+
+    .header-content h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-heading);
+        margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin: 0;
+    }
+
+    /* Project Card */
+    .project-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .project-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 28px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .project-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .project-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .project-info h2 {
+        margin: 0 0 6px 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .workspace-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    .project-stats {
+        display: flex;
+        gap: 30px;
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        opacity: 0.85;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Tasks Grid */
+    .tasks-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+    }
+
+    @media (max-width: 900px) {
+        .tasks-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .tasks-column {
+        padding: 24px;
+        min-height: 200px;
+    }
+
+    .tasks-column.assigned {
+        background: #fafbff;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .tasks-column.created {
+        background: #fffbfa;
+    }
+
+    @media (max-width: 900px) {
+        .tasks-column.assigned {
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+    }
+
+    .column-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .column-icon {
+        font-size: 20px;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-heading);
+    }
+
+    /* Task Card */
+    .task-card {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .task-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-badge.status-todo {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .status-badge.status-in_progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .status-badge.status-review {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-badge.status-completed {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .due-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .task-title {
+        margin: 0 0 8px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-heading);
+        line-height: 1.4;
+    }
+
+    .task-desc {
+        margin: 0 0 14px 0;
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .task-footer {
+        display: flex;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .creator, .assignee {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-body);
+    }
+
+    .avatar {
+        width: 26px;
+        height: 26px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .assigned-avatar {
+        background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    }
+
+    .unassigned {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Empty States */
+    .empty-column {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .empty-column p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: var(--bg-card);
+        border-radius: 16px;
+        border: 2px dashed var(--border-color);
+    }
+
+    .empty-illustration {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h2 {
+        color: var(--text-heading);
+        margin: 0 0 10px 0;
+        font-size: 24px;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}

@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     'comments',
     'projects',
     'tasks',
-    'workspaces'
+    'workspaces',
+       "debug_toolbar",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -141,4 +143,9 @@ LOGOUT_REDIRECT_URL = 'login'
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+]
+
+# Debug Toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
