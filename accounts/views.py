@@ -70,3 +70,25 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully')
     return redirect('login')
+
+
+from django.contrib.auth.decorators import login_required
+from workspaces.models import Workspace
+
+@login_required
+def profile_view(request):
+    user = request.user
+    
+    # Count total workspaces created by user
+    total_workspaces = Workspace.objects.filter(creator=user).count()
+    
+    # Count workspaces where user is a member
+    member_workspaces = user.workspace_memberships.count()
+    
+    context = {
+        'user': user,
+        'total_workspaces': total_workspaces,
+        'member_workspaces': member_workspaces,
+    }
+    
+    return render(request, 'accounts/profile.html', context)
