@@ -27,7 +27,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('workspace/',include('workspaces.urls')),
     path('projects/',include('projects.urls')),
-    path('tasks/',include('tasks.urls'))
+    path('tasks/',include('tasks.urls')),
+    path('api/',include('api.urls'))
 ]
 
 
