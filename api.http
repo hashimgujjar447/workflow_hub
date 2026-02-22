@@ -1,0 +1,19 @@
+
+POST http://127.0.0.1:8000/api/token/ 
+Content-Type: application/json
+
+{
+    "email":"hashim@example.com",
+    "password":"123456"
+}
+
+
+###
+POST http://127.0.0.1:8000/api/workspaces/ 
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNjYwNzkwLCJpYXQiOjE3NzE2NjA0OTAsImp0aSI6IjE2MGU3MmM3ZmYwZjQ4NTE5YmYwNGI5MzU2MTNmYzlkIiwidXNlcl9pZCI6IjEifQ.r4Ja0ZVkB8niy76e6TuFjb5OGu6xa3bSVLAqKO2kXdo
+
+{
+    "name":"qasim kar"
+}
+
