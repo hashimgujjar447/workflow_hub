@@ -70,7 +70,9 @@
     <div class="section-card">
         <div class="section-header">
             <h2>👥 Workspace Members ({{ total_members }})</h2>
+            {% if is_creator %}
             <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug %}">+ Add Member</a>
+            {% endif %}
         </div>
         
         {% if members %}

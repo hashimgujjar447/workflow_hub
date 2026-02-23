@@ -7,13 +7,14 @@ from django.contrib import messages
 from projects.models import Project,ProjectMember
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 # Create your views here.
 
 @login_required
 def workspaces(request):
     findAllWorkSpaces = Workspace.objects.filter(
-    creator=request.user
-).prefetch_related('members','projects')
+      Q(creator=request.user) | Q(members__user=request.user)
+).prefetch_related('members','projects').distinct()
 
     workspaces = {}
 
@@ -65,13 +66,14 @@ def create_workspace(request):
 
 @login_required
 def workspace_detail(request, slug):
-    workspace = get_object_or_404(Workspace, slug=slug, creator=request.user)
+    workspace = get_object_or_404(Workspace, slug=slug, )
     
     # Get workspace members
     members = workspace.members.select_related('user').all()
     
     # Get workspace projects
     projects = workspace.projects.all()
+    is_creator=request.user==workspace.creator
     
     context = {
         'workspace': workspace,
@@ -79,6 +81,8 @@ def workspace_detail(request, slug):
         'projects': projects,
         'total_members': members.count(),
         'total_projects': projects.count(),
+        'is_creator':is_creator
+        
     }
     
     return render(request, 'workspaces/workspace_detail.html', context)

@@ -7,7 +7,7 @@ class ListCreateWorkspaceMembersApiView(generics.ListCreateAPIView):
     serializer_class=WorkSpaceMemberSerializer
 
     def get_queryset(self):
-        slug = self.kwargs['slug']
+        slug = self.kwargs['workspace_slug']
         return WorkspaceMember.objects.filter(
             workspace__slug=slug,
             is_active=True

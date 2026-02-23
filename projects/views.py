@@ -5,6 +5,7 @@ from tasks.models import Task
 from comments.models import TaskComment
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 @login_required
@@ -33,13 +34,11 @@ def projects(request):
 @login_required
 def project_detail(request, workspace_slug, project_slug):
     
-    # Get workspace and verify ownership
     workspace = get_object_or_404(
-        Workspace,
-        slug=workspace_slug,
-        creator=request.user
+        Workspace.objects.distinct(),
+        Q(creator=request.user) | Q(members__user=request.user),
+        slug=workspace_slug
     )
-    
     # Get project belonging to this workspace
     project = get_object_or_404(
         Project.objects.prefetch_related(
