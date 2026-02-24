@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.utils.text import slugify
 from workspaces.models import Workspace
 from django.db.models import Count
+from tasks.models import Task
+from api.serializers.task_serializers import ProjectTaskSerializer
 class WorkspaceProjectApiView(generics.ListCreateAPIView):
       queryset=Project.objects.all()
       serializer_class=WorkspaceProjectSerializer
@@ -39,3 +41,11 @@ class WorkspaceProjectDetailsApiView(generics.RetrieveUpdateDestroyAPIView):
                 distinct=True
             )
         )
+      
+      
+
+class ProjectTasksApiView(generics.ListAPIView):
+      queryset=Task.objects.all()
+      
+      serializer_class=ProjectTaskSerializer
+            

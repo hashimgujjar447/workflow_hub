@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from api.views.workspace import ListCreateWorkspaceView,WorkSpaceDetailView
 from api.views.workspace_members import ListCreateWorkspaceMembersApiView
-from api.views.workspace_projects import WorkspaceProjectApiView,WorkspaceProjectDetailsApiView
+from api.views.workspace_projects import WorkspaceProjectApiView,WorkspaceProjectDetailsApiView,ProjectTasksApiView
 from django.urls import path
 
 
@@ -19,4 +19,5 @@ urlpatterns = [
 
     path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/',
          WorkspaceProjectDetailsApiView.as_view()),
+path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/',ProjectTasksApiView.as_view())
 ]
