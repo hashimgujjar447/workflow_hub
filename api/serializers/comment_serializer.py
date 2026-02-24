@@ -8,4 +8,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskComment
-        fields = ['task', 'author', 'content', 'created_at', 'updated_at']
+        fields = ['task', 'author', 'content', 'created_at', 'updated_at','parent_comment']

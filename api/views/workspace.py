@@ -6,6 +6,7 @@ from rest_framework import permissions
 class ListCreateWorkspaceView(generics.ListCreateAPIView):
    
     serializer_class=WorkspaceSerializer
+    permission_classes=[permissions.IsAuthenticated]
 
     def get_queryset(self):
       

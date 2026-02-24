@@ -24,5 +24,5 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
             'comments'
         ]
     def get_comments(self, obj):
-        parent_comment=obj.comments.filter(parent_comment__isnull=True)[:2]
+        parent_comment=obj.comments.filter(parent_comment__isnull=True).select_related('author')[:1]
         return CommentSerializer(parent_comment,many=True).data    
