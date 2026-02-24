@@ -16,7 +16,7 @@ def workspaces(request):
       Q(creator=request.user) | Q(members__user=request.user)
 ).prefetch_related('members','projects').distinct()
 
-    workspaces = {}
+    workspaces = {} 
 
     for workspace in findAllWorkSpaces:
         workspaces[workspace.id] = {
@@ -59,6 +59,7 @@ def create_workspace(request):
             is_active=(is_active=="true"),
             creator=request.user
         )
+        
         if create:
             return redirect('workspaces')
     return render(request,'workspaces/create_workspace.html')
@@ -66,7 +67,7 @@ def create_workspace(request):
 
 @login_required
 def workspace_detail(request, slug):
-    workspace = get_object_or_404(Workspace, slug=slug, )
+    workspace = get_object_or_404(Workspace, slug=slug)
     
     # Get workspace members
     members = workspace.members.select_related('user').all()
