@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="settings-container">
+    <div class="settings-card">
+        <h1 class="settings-title">Project Settings</h1>
+
+        <div class="form-group">
+            <label>Project Name</label>
+            <input type="text" value="{{ project.name }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Project ID</label>
+            <input type="text" value="{{ project.id }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Workspace</label>
+            <input type="text" value="{{ workspace.name }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Project Status</label>
+            <input type="text" value="{{ project.get_status_display }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Created By</label>
+            <input type="text" value="{{ project.created_by.first_name }} {{ project.created_by.last_name }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Created At</label>
+            <input type="text" value="{{ project.created_at|date:'F d, Y' }}" readonly>
+        </div>
+
+        <div class="divider"></div>
+        
+        {% if is_allow_to_delete %}
+        <form method="post" class="danger-zone" onsubmit="return confirm('Are you sure you want to delete this project? This action cannot be undone.');">
+            {% csrf_token %}
+            <h3>Danger Zone</h3>
+            <p style="color: #DC2626; margin-bottom: 15px;">⚠️ Only Managers and Leaders can delete projects</p>
+            <button class="btn-danger" type="submit">Delete Project</button>
+        </form>
+        {% else %}
+        <div class="info-message">
+            <p>🔒 You don't have permission to delete this project. Only Managers and Leaders can delete projects.</p>
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+
+<style>
+.settings-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.settings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.settings-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    background: #F9FAFB;
+    color: var(--text-body);
+}
+
+.divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 40px 0;
+}
+
+.danger-zone {
+    padding: 24px;
+    background: #FEF2F2;
+    border: 2px solid #FEE2E2;
+    border-radius: 8px;
+}
+
+.danger-zone h3 {
+    color: #DC2626;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.btn-danger {
+    background: #DC2626;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover {
+    background: #B91C1C;
+}
+
+.info-message {
+    padding: 20px;
+    background: #FEF3C7;
+    border: 1px solid #FDE68A;
+    border-radius: 8px;
+    color: #92400E;
+    text-align: center;
+}
+</style>
+
+{% endblock %}

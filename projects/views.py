@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from workspaces.models import Workspace
 from .models import Project, ProjectMember
 from tasks.models import Task
@@ -6,6 +6,8 @@ from comments.models import TaskComment
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 
 
 @login_required
@@ -164,24 +166,45 @@ def add_member(request, workspace_slug, project_slug):
         'available_members': check_which_member_not_in_project
     }
     return render(request, 'projects/add_new_member.html', context)
-            
 
-# @login_required
-# def project_settings(request, workspace_slug, project_slug):
-#     def can_delete_project(user, workspace):
-#         return workspace.members.filter(
-#             user=user,
-#             role__in=["manager", "leader"],
-#             is_active=True
-#         ).exists()
-#     if request.method=="POST":
-#         workspace=get_object_or_404(
-#              Workspace.objects.prefetch_related("projects"),
-#              slug=workspace_slug,
-#              is_active=True
-#         )
-#         if can_delete_project(request.user,workspace):
 
-            
+@login_required
+def project_settings(request, workspace_slug, project_slug):
+    workspace = get_object_or_404(
+        Workspace,
+        slug=workspace_slug,
+        is_active=True
+    )
+    
+    project = get_object_or_404(
+        Project.objects.prefetch_related("members"),
+        slug=project_slug,
+        workspace=workspace
+    )
+
+    # Check if user is manager or leader
+    is_manager_or_leader = project.members.filter(
+        member=request.user,
+        role__in=["manager", "leader"],
+        is_active=True
+    ).exists()
+
+    if request.method == "POST":
+        if not is_manager_or_leader:
+            raise PermissionDenied("You are not allowed to delete this project.")
         
-#     return render("projects/settings.html")
+        project.is_active = False
+        project.save()
+        messages.success(request, f'Project "{project.name}" has been deleted successfully.')
+        return redirect('workspace_detail', slug=workspace.slug)
+
+    return render(
+        request,
+        'projects/settings.html',
+        {
+            'workspace': workspace,
+            'project': project,
+            'is_allow_to_delete': is_manager_or_leader
+        }
+    )
+    

@@ -35,7 +35,9 @@
             </div>
         </div>
         <div class="header-actions">
-            <button class="btn btn-secondary">⚙️ Settings</button>
+            {% if is_allow_to_delete_and_create %}
+            <a href="{% url 'project_settings' workspace.slug project.slug %}" class="btn btn-secondary">⚙️ Settings</a>
+            {% endif %}
             <button class="btn btn-primary">➕ Add Task</button>
         </div>
     </div>

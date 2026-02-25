@@ -1,6 +1,6 @@
 # WorkflowHub 🚀
 
-A robust team workflow management system built with Django 6.0. WorkflowHub helps teams organize work using a hierarchy: **Workspaces → Projects → Tasks**, featuring secure authentication, role-based access, and threaded comments.
+A robust team workflow management system built with Django 6.0. WorkflowHub helps teams organize work using a hierarchy: **Workspaces → Projects → Tasks**, featuring secure authentication, role-based access, threaded comments, and a full-featured REST API.
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue)
 ![Django](https://img.shields.io/badge/Django-6.0-green)
@@ -21,10 +21,11 @@ A robust team workflow management system built with Django 6.0. WorkflowHub help
 8. [Views & Business Logic](#-views--business-logic)
 9. [Templates](#-templates)
 10. [Authentication System](#-authentication-system)
-11. [Installation Guide](#-installation-guide)
-12. [Configuration](#-configuration)
-13. [Usage Guide](#-usage-guide)
-14. [Contributing](#-contributing)
+11. [REST API](#-rest-api)
+12. [Installation Guide](#-installation-guide)
+13. [Configuration](#-configuration)
+14. [Usage Guide](#-usage-guide)
+15. [Contributing](#-contributing)
 
 ---
 
@@ -51,6 +52,7 @@ User → Workspace → Project → Task → Comment
 - **Project Management:** Projects within workspaces, status tracking, role-based membership
 - **Task Management:** Tasks within projects, assignment, status workflow, due dates
 - **Comments & Collaboration:** Threaded comments, nested replies, author tracking
+- **REST API:** Full-featured RESTful API with JWT authentication, workspace/project/task/comment endpoints
 - **Modern UI:** Responsive design, CSS variables, sidebar navigation, status badges
 
 ---
@@ -60,6 +62,8 @@ User → Workspace → Project → Task → Comment
 | Category            | Technology                  |
 |---------------------|----------------------------|
 | Backend Framework   | Django 6.0.1               |
+| API Framework       | Django REST Framework      |
+| Authentication      | JWT (Simple JWT)           |
 | Database            | SQLite                     |
 | Frontend            | HTML5, CSS3, JavaScript    |
 | CSS Architecture    | Custom CSS with Variables  |
@@ -73,6 +77,8 @@ asgiref==3.11.0
 sqlparse==0.5.5
 tzdata==2025.3
 django-debug-toolbar==6.2.0
+djangorestframework
+djangorestframework-simplejwt
 ```
 
 ---
@@ -123,6 +129,23 @@ workflow_management_system/
 │   ├── urls.py
 │   └── admin.py
 │
+├── api/
+│   ├── urls.py
+│   ├── serializers/
+│   │   ├── workspace.py
+│   │   ├── workspace_members.py
+│   │   ├── workspace_projects.py
+│   │   ├── task_serializers.py
+│   │   ├── comment_serializer.py
+│   │   ├── comment_reply_serializer.py
+│   │   └── common_serializers.py
+│   └── views/
+│       ├── workspace.py
+│       ├── workspace_members.py
+│       ├── workspace_projects.py
+│       ├── project_task_details.py
+│       └── task_comments.py
+│
 ├── templates/
 │   ├── base.html
 │   ├── home.html
@@ -154,9 +177,9 @@ workflow_hub (settings, urls, views)
 ├── accounts (auth)
 ├── workspaces (team spaces)
 ├── projects (project mgmt)
-│
 ├── tasks (work items)
-└── comments (discussions)
+├── comments (discussions)
+└── api (REST API)
 ```
 
 ### Request Flow
@@ -178,7 +201,8 @@ URL Router → Middleware → Views (@login_required) → Models → Templates �
 Account ──▶ Workspace ──▶ Project ──▶ Task ──▶ TaskComment
      │           │             │           │         ▲
      │           │             │           │         │
-WorkspaceMember ProjectMember TaskComment (self-referencing for replies)
+WorkspaceMember ProjectMember             │         │
+                                  (self-referencing for replies)
 ```
 
 ---
@@ -271,7 +295,13 @@ class Project(Model):
 
 ```python
 class ProjectMember(Model):
-        ROLE_CHOICES = (...)  # Same as WorkspaceMember
+        ROLE_CHOICES = (
+                ('manager', 'Manager'),
+                ('leader', 'Leader'),
+                ('frontend', 'Frontend Developer'),
+                ('backend', 'Backend Developer'),
+                ('seo', 'SEO'),
+        )
         member = ForeignKey(Account, on_delete=CASCADE, related_name='project_memberships')
         project = ForeignKey(Project, on_delete=CASCADE, related_name='members')
         role = CharField(max_length=50, choices=ROLE_CHOICES)
@@ -324,22 +354,57 @@ class TaskComment(Model):
 
 ## 🔗 URL Routes
 
+### Web Application Routes
+
 - **Root URLs:** `/`, `/admin/`, `/accounts/*`, `/workspace/*`, `/projects/*`, `/tasks/*`, `/__debug__/*`
-- **Accounts:** `/accounts/login/`, `/accounts/register/`, `/accounts/logout/`
-- **Workspaces:** `/workspace/`, `/workspace/create/`, `/workspace/<slug>/`, `/workspace/<slug>/add_member/`, `/workspace/<slug>/create_project/`
+- **Accounts:** `/accounts/login/`, `/accounts/register/`, `/accounts/logout/`, `/accounts/profile/`
+- **Workspaces:** `/workspace/`, `/workspace/create/`, `/workspace/<slug>/`, `/workspace/<slug>/add_member/`, `/workspace/<slug>/create_project/`, `/workspace/<slug>/settings/`
 - **Projects:** `/projects/`, `/projects/<ws_slug>/<proj_slug>/`, `/projects/<ws_slug>/<proj_slug>/add_new_member`, `/projects/<ws_slug>/<proj_slug>/task/*`, `/projects/<ws_slug>/<proj_slug>/comment/*`
 - **Tasks:** `/tasks/get_all_tasks/`, `/.../task/add_task`
 - **Comments:** `/.../comment/<id>/`
+
+### REST API Routes
+
+- **Authentication:**
+  - `POST /api/token/` - Obtain JWT token pair
+  - `POST /api/token/refresh/` - Refresh access token
+
+- **Workspaces:**
+  - `GET /api/workspaces/` - List user's workspaces
+  - `POST /api/workspaces/` - Create new workspace
+  - `GET /api/workspaces/<slug>/` - Retrieve workspace details
+  - `PUT/PATCH /api/workspaces/<slug>/` - Update workspace
+  - `DELETE /api/workspaces/<slug>/` - Delete workspace
+
+- **Workspace Members:**
+  - `GET /api/workspaces/<slug>/members/` - List workspace members
+  - `POST /api/workspaces/<slug>/members/` - Add member to workspace
+
+- **Projects:**
+  - `GET /api/workspaces/<slug>/projects/` - List workspace projects
+  - `POST /api/workspaces/<slug>/projects/` - Create project in workspace
+  - `GET /api/workspaces/<slug>/projects/<project_slug>/` - Retrieve project details
+  - `PUT/PATCH /api/workspaces/<slug>/projects/<project_slug>/` - Update project
+  - `DELETE /api/workspaces/<slug>/projects/<project_slug>/` - Delete project
+
+- **Tasks:**
+  - `GET /api/workspaces/<slug>/projects/<project_slug>/tasks/` - List project tasks
+  - `GET /api/workspaces/<slug>/projects/<project_slug>/tasks/<id>/` - Retrieve task details
+
+- **Comments:**
+  - `GET /api/workspaces/<slug>/projects/<project_slug>/tasks/<id>/comments/` - List task comments
+  - `POST /api/workspaces/<slug>/projects/<project_slug>/tasks/<id>/comments/` - Add comment to task
 
 ---
 
 ## 🎯 Views & Business Logic
 
 - **Authentication:** Login, register, logout views; email/password authentication
-- **Workspace:** List, create, detail, add member, create project
+- **Workspace:** List, create, detail, add member, create project, settings
 - **Project:** List, detail, add member
-- **Task:** Dashboard, create task
+- **Task:** Dashboard, create task, list tasks
 - **Comment:** View/add comments, threaded replies
+- **API Views:** RESTful views for all resources with permissions
 
 ---
 
@@ -347,50 +412,168 @@ class TaskComment(Model):
 
 - **base.html:** Master layout, sidebar, navigation
 - **home.html:** Dashboard
-- **accounts:** Login/register templates
-- **workspaces:** List, create, detail, add member, create project
+- **accounts:** Login/register/profile templates
+- **workspaces:** List, create, detail, add member, create project, settings
 - **projects:** List, detail, create, add member
-- **tasks:** Create task
+- **tasks:** Create task, all tasks
 - **task:** Task dashboard, comments, reusable fragments
 
 ---
 
 ## 🔐 Authentication System
 
+### Web Authentication
 - Custom user model (`AUTH_USER_MODEL = 'accounts.Account'`)
+- Email-based login (USERNAME_FIELD = 'email')
 - All views protected with `@login_required`
 - Login/logout redirects configured in `settings.py`
+
+### API Authentication
+- **JWT (JSON Web Tokens)** via djangorestframework-simplejwt
+- **Session Authentication** for browsable API
+- All API endpoints require authentication (`IsAuthenticated` permission)
+- Token obtain: `POST /api/token/` with email and password
+- Token refresh: `POST /api/token/refresh/` with refresh token
+
+---
+
+## 🌐 REST API
+
+### Overview
+
+WorkflowHub provides a comprehensive RESTful API built with Django REST Framework, featuring JWT authentication and full CRUD operations for all resources.
+
+### API Features
+
+- **Authentication:** JWT token-based authentication
+- **Permissions:** All endpoints require authentication
+- **Serialization:** JSON request/response format
+- **Browsable API:** Interactive API documentation at `/api/`
+- **Pagination:** Configurable pagination for list endpoints
+- **Nested Resources:** Hierarchical resource structure (workspace → project → task → comment)
+
+### API Endpoints Summary
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/token/` | Obtain JWT token |
+| POST | `/api/token/refresh/` | Refresh access token |
+| GET/POST | `/api/workspaces/` | List/Create workspaces |
+| GET/PUT/DELETE | `/api/workspaces/<slug>/` | Workspace details |
+| GET/POST | `/api/workspaces/<slug>/members/` | Workspace members |
+| GET/POST | `/api/workspaces/<slug>/projects/` | List/Create projects |
+| GET/PUT/DELETE | `/api/workspaces/<slug>/projects/<slug>/` | Project details |
+| GET | `/api/workspaces/<slug>/projects/<slug>/tasks/` | List tasks |
+| GET | `/api/workspaces/<slug>/projects/<slug>/tasks/<id>/` | Task details |
+| GET/POST | `/api/workspaces/<slug>/projects/<slug>/tasks/<id>/comments/` | Task comments |
+
+### API Response Format
+
+Successful responses include relevant data with appropriate HTTP status codes:
+- `200 OK` - Successful GET/PUT/PATCH
+- `201 Created` - Successful POST
+- `204 No Content` - Successful DELETE
+- `400 Bad Request` - Validation errors
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Permission denied
+- `404 Not Found` - Resource not found
 
 ---
 
 ## 🚀 Installation Guide
 
 1. **Clone:** `git clone https://github.com/yourusername/workflow_management_system.git`
-2. **Virtual Env:** `python -m venv env` & activate
-3. **Install:** `pip install django django-debug-toolbar`
-4. **Migrate:** `python manage.py migrate`
-5. **Superuser:** `python manage.py createsuperuser`
-6. **Run:** `python manage.py runserver`
-7. **Access:** http://127.0.0.1:8000/
+2. **Navigate:** `cd workflow_management_system`
+3. **Virtual Env:** `python -m venv env` & activate
+   - Windows: `env\Scripts\activate`
+   - Unix/Mac: `source env/bin/activate`
+4. **Install Dependencies:** 
+   ```bash
+   pip install django==6.0.1
+   pip install django-debug-toolbar
+   pip install djangorestframework
+   pip install djangorestframework-simplejwt
+   ```
+5. **Migrate Database:** `python manage.py migrate`
+6. **Create Superuser:** `python manage.py createsuperuser`
+7. **Run Server:** `python manage.py runserver`
+8. **Access Application:** 
+   - Web UI: http://127.0.0.1:8000/
+   - Admin Panel: http://127.0.0.1:8000/admin/
+   - API: http://127.0.0.1:8000/api/
 
 ---
 
 ## ⚙️ Configuration
 
-- `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASES`, `STATIC_URL`, `AUTH_USER_MODEL`, `LOGIN_URL`
-- Installed apps: accounts, comments, projects, tasks, workspaces, debug_toolbar
+### Core Settings
+- `SECRET_KEY`: Django secret key (change in production)
+- `DEBUG`: Set to `True` for development, `False` for production
+- `ALLOWED_HOSTS`: List of allowed hostnames
+- `DATABASES`: SQLite database configuration
+- `STATIC_URL`: Static files URL configuration
+- `AUTH_USER_MODEL`: `'accounts.Account'` (custom user model)
+- `LOGIN_URL`: `'login'`
+- `LOGIN_REDIRECT_URL`: `'home'`
+- `LOGOUT_REDIRECT_URL`: `'login'`
+
+### Installed Apps
+- Django core apps (admin, auth, contenttypes, sessions, messages, staticfiles)
+- Custom apps: accounts, workspaces, projects, tasks, comments, api
+- Third-party: debug_toolbar, rest_framework
+
+### REST Framework Configuration
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
+```
 
 ---
 
 ## 📖 Usage Guide
 
-1. Register at `/accounts/register/`
-2. Login
-3. Create workspace
-4. Add members
-5. Create project
-6. Add tasks
-7. Comment on tasks
+### Web Application
+
+1. **Register:** Navigate to `/accounts/register/` and create an account
+2. **Login:** Use your email and password at `/accounts/login/`
+3. **Create Workspace:** Go to `/workspace/create/` to set up your team workspace
+4. **Add Members:** Invite team members with roles (Manager, Leader, Frontend, Backend, SEO)
+5. **Create Project:** Within a workspace, create projects with status tracking
+6. **Add Tasks:** Create tasks within projects, assign to team members, set due dates
+7. **Collaborate:** Add comments to tasks, reply to comments for threaded discussions
+8. **Manage:** Use workspace settings to manage team and projects
+
+### REST API Usage
+
+1. **Obtain Token:**
+   ```bash
+   curl -X POST http://127.0.0.1:8000/api/token/ \
+     -H "Content-Type: application/json" \
+     -d '{"email": "user@example.com", "password": "yourpassword"}'
+   ```
+
+2. **Make Authenticated Requests:**
+   ```bash
+   curl -X GET http://127.0.0.1:8000/api/workspaces/ \
+     -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+   ```
+
+3. **Create Workspace:**
+   ```bash
+   curl -X POST http://127.0.0.1:8000/api/workspaces/ \
+     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"name": "My Workspace"}'
+   ```
+
+4. **Browse API:** Visit http://127.0.0.1:8000/api/ in your browser for the browsable API interface
 
 ---
 
@@ -418,16 +601,19 @@ class TaskComment(Model):
 
 ## 🔜 Roadmap / Future Features
 
-- REST API
+- ✅ ~~REST API~~ (Implemented)
 - Email notifications
 - File attachments
 - Audit logs
 - Analytics & charts
 - Kanban board
-- Real-time updates
-- Export tasks
+- Real-time updates (WebSockets)
+- Export tasks (PDF, CSV)
 - Calendar view
-- Search/filter
+- Advanced search & filtering
+- Task dependencies
+- Time tracking
+- Mobile app
 
 ---
 
