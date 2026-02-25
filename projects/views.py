@@ -10,7 +10,7 @@ from django.db.models import Q
 
 @login_required
 def projects(request):
-    workspaces = Workspace.objects.filter(creator=request.user)
+    workspaces = Workspace.objects.filter( Q(creator=request.user) | Q(members__user=request.user) ,is_active=True)
     selected_projects = None
 
     if request.method == "POST":
@@ -18,8 +18,9 @@ def projects(request):
 
         workspace = get_object_or_404(
             Workspace,
-            slug=workspace_slug,
-            creator=request.user
+            
+             Q(creator=request.user) | Q(members__user=request.user) ,is_active=True,
+             slug=workspace_slug,
         )
 
         selected_projects = workspace.projects.all()
@@ -82,6 +83,7 @@ def project_detail(request, workspace_slug, project_slug):
         'completed_tasks': completed_tasks,
         'in_progress_tasks': in_progress_tasks,
         'todo_tasks': todo_tasks,
+        'is_allow_to_delete_and_create':project.members.filter( member=request.user,role__in=['leader','manager'],is_active=True)
     }
    
     
@@ -98,42 +100,50 @@ def add_member(request, workspace_slug, project_slug):
     
     workspace = get_object_or_404(
         Workspace,
-        slug=workspace_slug
+        slug=workspace_slug,
+        is_active=True
     )
     
     project = get_object_or_404(
         Project,
         slug=project_slug,
-        workspace=workspace
+        workspace=workspace,
+        is_active=True
     )
     
     if request.method == "POST":
         member_id = request.POST.get('member_id')
         role = request.POST.get('role')
+
+        if project.members.filter( member=request.user,role__in=['leader','manager'],is_active=True):
         
-        if member_id and role:
-            try:
-                user = User.objects.get(id=member_id)
-                
-                # Check if member already exists in project
-                if not ProjectMember.objects.filter(project=project, member=user).exists():
-                    ProjectMember.objects.create(
-                        project=project,
-                        member=user,
-                        role=role
-                    )
-                    messages.success(request, f'{user.first_name} {user.last_name} has been added to the project.')
-                else:
-                    messages.warning(request, 'This member is already in the project.')
+            if member_id and role:
+                try:
+                    user = User.objects.get(id=member_id)
                     
-            except User.DoesNotExist:
-                messages.error(request, 'Selected user does not exist.')
-        else:
-            messages.error(request, 'Please select a member and role.')
+                    # Check if member already exists in project
+                    if not ProjectMember.objects.filter(project=project, member=user).exists():
+                        ProjectMember.objects.create(
+                            project=project,
+                            member=user,
+                            role=role
+                        )
+                        messages.success(request, f'{user.first_name} {user.last_name} has been added to the project.')
+                    else:
+                        messages.warning(request, 'This member is already in the project.')
+                        
+                except User.DoesNotExist:
+                    messages.error(request, 'Selected user does not exist.')
+            else:
+              
+                messages.error(request, 'Please select a member and role.')
             
         return redirect('project_detail', workspace_slug=workspace_slug, project_slug=project_slug)
+      
+
     
     # GET request - show form
+
     get_all_available_members = workspace.members.all()
     all_project_members = project.members.all()
     
@@ -155,3 +165,23 @@ def add_member(request, workspace_slug, project_slug):
     }
     return render(request, 'projects/add_new_member.html', context)
             
+
+# @login_required
+# def project_settings(request, workspace_slug, project_slug):
+#     def can_delete_project(user, workspace):
+#         return workspace.members.filter(
+#             user=user,
+#             role__in=["manager", "leader"],
+#             is_active=True
+#         ).exists()
+#     if request.method=="POST":
+#         workspace=get_object_or_404(
+#              Workspace.objects.prefetch_related("projects"),
+#              slug=workspace_slug,
+#              is_active=True
+#         )
+#         if can_delete_project(request.user,workspace):
+
+            
+        
+#     return render("projects/settings.html")

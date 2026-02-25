@@ -98,7 +98,10 @@
     <div class="section-card">
         <div class="section-header">
             <h2>👥 Team Members ({{ total_members }})</h2>
-            <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug project.slug %}">+ Add Member</a>
+            {% if is_allow_to_delete_and_create %}
+             <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug project.slug %}">+ Add Member</a>
+            {% endif %}
+           
         </div>
         
         {% if members %}

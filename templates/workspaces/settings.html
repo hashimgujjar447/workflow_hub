@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="settings-container">
+    <div class="settings-card">
+        <h1 class="settings-title">Workspace Settings</h1>
+
+        <div class="form-group">
+            <label>Workspace Name</label>
+            <input type="text" value="{{ workspace.name }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Workspace ID</label>
+            <input type="text" value="{{ workspace.id }}" readonly>
+        </div>
+
+        <div class="divider"></div>
+        {% if is_allow_to_delete %}
+        <form method="post" class="danger-zone">
+            {% csrf_token %}
+            <h3>Danger Zone</h3>
+            <button class="btn-danger" type="submit">Delete Workspace</button>
+        </form>
+             {% endif %}
+        
+    </div>
+</div>
+
+{% endblock %}
