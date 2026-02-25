@@ -3,12 +3,12 @@
 <div class="workspaces-page">
   <div class="page-header">
     <div>
-      <h1>Welcome back, {{ user.first_name }} {{ user.last_name }}! 👋</h1>
+      <h1>Welcome back, {{ user.first_name }} {{ user.last_name }}! <i class="fas fa-hand-peace"></i></h1>
       <p>Manage your workspaces and collaborate with your team</p>
     </div>
     <div class="workspace_create_div">
       <a href="{% url 'create_workspace' %}" class="btn btn-primary">
-        <span>➕</span> Create Workspace
+        <span><i class="fas fa-plus"></i></span> Create Workspace
       </a>
     </div>
   </div>
@@ -21,7 +21,7 @@
       {% for key,value in all_workspaces.items %}
       <div class="workspace_card">
         <div class="workspace_card_header">
-          <div class="workspace_icon">🏢</div>
+          <div class="workspace_icon"><i class="fas fa-building"></i></div>
           <div class="workspace_menu">⋮</div>
         </div>
         
@@ -33,7 +33,7 @@
         <div class="workspace_card_stats">
           <div class="stat_item">
             <div class="stat_content">
-              <span class="stat_icon">📁</span>
+              <span class="stat_icon"><i class="fas fa-folder"></i></span>
               <span class="stat_value">{{ value.projects }}</span>
             </div>
             <span class="stat_label">Projects</span>
@@ -41,7 +41,7 @@
           <div class="stat_divider"></div>
           <div class="stat_item">
             <div class="stat_content">
-              <span class="stat_icon">👥</span>
+              <span class="stat_icon"><i class="fas fa-users"></i></span>
               <span class="stat_value">{{ value.members.count|default:"0" }}</span>
             </div>
             <span class="stat_label">Members</span>
@@ -56,11 +56,11 @@
     </div>
     {% else %}
     <div class="empty-state">
-      <div class="empty-icon">📂</div>
+      <div class="empty-icon"><i class="fas fa-folder-open" style="font-size: 64px;"></i></div>
       <h3>No workspaces yet</h3>
       <p>Create your first workspace to get started with your projects</p>
       <a href="{% url 'create_workspace' %}" class="btn btn-primary" style="margin-top: 20px;">
-        <span>➕</span> Create Your First Workspace
+        <span><i class="fas fa-plus"></i></span> Create Your First Workspace
       </a>
     </div>
     {% endif %}

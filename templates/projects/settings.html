@@ -42,12 +42,12 @@
         <form method="post" class="danger-zone" onsubmit="return confirm('Are you sure you want to delete this project? This action cannot be undone.');">
             {% csrf_token %}
             <h3>Danger Zone</h3>
-            <p style="color: #DC2626; margin-bottom: 15px;">⚠️ Only Managers and Leaders can delete projects</p>
+            <p style="color: #DC2626; margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Only Managers and Leaders can delete projects</p>
             <button class="btn-danger" type="submit">Delete Project</button>
         </form>
         {% else %}
         <div class="info-message">
-            <p>🔒 You don't have permission to delete this project. Only Managers and Leaders can delete projects.</p>
+            <p><i class="fas fa-lock"></i> You don't have permission to delete this project. Only Managers and Leaders can delete projects.</p>
         </div>
         {% endif %}
         

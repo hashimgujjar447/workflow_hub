@@ -14,7 +14,7 @@
     <!-- Project Header -->
     <div class="detail-header">
         <div class="header-left">
-            <div class="project-icon-large">📁</div>
+            <div class="project-icon-large"><i class="fas fa-folder-open"></i></div>
             <div class="header-info">
                 <h1>{{ project.name }}</h1>
                 <p class="project-meta">
@@ -23,50 +23,50 @@
                 </p>
                 <div class="status-badges">
                     <span class="badge badge-status-{{ project.status }}">
-                        {% if project.status == 'pending' %}⏳{% elif project.status == 'in_progress' %}🔄{% elif project.status == 'completed' %}✅{% else %}❌{% endif %}
+                        {% if project.status == 'pending' %}<i class="fas fa-clock"></i>{% elif project.status == 'in_progress' %}<i class="fas fa-spinner"></i>{% elif project.status == 'completed' %}<i class="fas fa-check-circle"></i>{% else %}<i class="fas fa-times-circle"></i>{% endif %}
                         {{ project.get_status_display }}
                     </span>
                     {% if project.is_active %}
-                        <span class="badge badge-success">🟢 Active</span>
+                        <span class="badge badge-success"><i class="fas fa-circle" style="color: #10b981;"></i> Active</span>
                     {% else %}
-                        <span class="badge badge-inactive">⚫ Inactive</span>
+                        <span class="badge badge-inactive"><i class="fas fa-circle" style="color: #6b7280;"></i> Inactive</span>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="header-actions">
             {% if is_allow_to_delete_and_create %}
-            <a href="{% url 'project_settings' workspace.slug project.slug %}" class="btn btn-secondary">⚙️ Settings</a>
+            <a href="{% url 'project_settings' workspace.slug project.slug %}" class="btn btn-secondary"><i class="fas fa-cog"></i> Settings</a>
             {% endif %}
-            <button class="btn btn-primary">➕ Add Task</button>
+            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Task</button>
         </div>
     </div>
 
     <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
             <div class="stat-content">
                 <h3>{{ total_members }}</h3>
                 <p>Team Members</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="fas fa-tasks"></i></div>
             <div class="stat-content">
                 <h3>{{ total_tasks }}</h3>
                 <p>Total Tasks</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">🎯</div>
+            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
             <div class="stat-content">
                 <h3>{{ completed_tasks }}</h3>
                 <p>Completed</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">🔄</div>
+            <div class="stat-icon"><i class="fas fa-spinner"></i></div>
             <div class="stat-content">
                 <h3>{{ in_progress_tasks }}</h3>
                 <p>In Progress</p>
@@ -90,16 +90,16 @@
             <div class="progress-fill" style="width: {% if total_tasks > 0 %}{% widthratio completed_tasks total_tasks 100 %}%{% else %}0%{% endif %}"></div>
         </div>
         <div class="progress-labels">
-            <span>📝 To Do: {{ todo_tasks }}</span>
-            <span>🔄 In Progress: {{ in_progress_tasks }}</span>
-            <span>✅ Completed: {{ completed_tasks }}</span>
+            <span><i class="fas fa-clipboard-list"></i> To Do: {{ todo_tasks }}</span>
+            <span><i class="fas fa-spinner"></i> In Progress: {{ in_progress_tasks }}</span>
+            <span><i class="fas fa-check-circle"></i> Completed: {{ completed_tasks }}</span>
         </div>
     </div>
 
     <!-- Team Members Section -->
     <div class="section-card">
         <div class="section-header">
-            <h2>👥 Team Members ({{ total_members }})</h2>
+            <h2><i class="fas fa-users"></i> Team Members ({{ total_members }})</h2>
             {% if is_allow_to_delete_and_create %}
              <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug project.slug %}">+ Add Member</a>
             {% endif %}
@@ -134,7 +134,7 @@
     <!-- Tasks Section -->
     <div class="section-card">
         <div class="section-header">
-            <h2>✅ Tasks ({{ total_tasks }})</h2>
+            <h2><i class="fas fa-tasks"></i> Tasks ({{ total_tasks }})</h2>
             <a href="{% url 'add_project_task' workspace.slug project.slug %}" class="btn btn-sm btn-primary">+ Add New Task</a>
         </div>
         
@@ -168,30 +168,34 @@
                         <div class="task-meta">
                             {% if task.assigned_to %}
                             <span class="task-assignee">
-                                👤 {{ task.assigned_to.member.first_name }} {{ task.assigned_to.member.last_name }}
+                                <i class="fas fa-user"></i> {{ task.assigned_to.member.first_name }} {{ task.assigned_to.member.last_name }}
                             </span>
                             {% else %}
-                            <span class="task-assignee">👤 Unassigned</span>
+                            <span class="task-assignee"><i class="fas fa-user"></i> Unassigned</span>
                             {% endif %}
                             {% if task.due_date %}
-                            <span class="task-due-date">📅 {{ task.due_date|date:"M d, Y" }}</span>
+                            <span class="task-due-date"><i class="fas fa-calendar-alt"></i> {{ task.due_date|date:"M d, Y" }}</span>
                             {% endif %}
                             <span class="task-created">Created {{ task.created_at|timesince }} ago</span>
                         </div>
                     </div>
                     <div class="task-status">
                         <span class="status-badge status-{{ task.status }}">
-                            {% if task.status == 'todo' %}📝
-                            {% elif task.status == 'in_progress' %}🔄
-                            {% elif task.status == 'review' %}👀
-                            {% elif task.status == 'completed' %}✅
-                            {% else %}❌{% endif %}
+                            {% if task.status == 'todo' %}<i class="fas fa-clipboard-list"></i>
+                            {% elif task.status == 'in_progress' %}<i class="fas fa-spinner"></i>
+                            {% elif task.status == 'review' %}<i class="fas fa-eye"></i>
+                            {% elif task.status == 'completed' %}<i class="fas fa-check-circle"></i>
+                            {% else %}<i class="fas fa-times-circle"></i>{% endif %}
                             {{ task.get_status_display }}
                         </span>
                     </div>
                     <div class="task-actions">
-                        <button class="btn-icon" title="Edit">✏️</button>
-                        <button class="btn-icon" title="Delete">🗑️</button>
+                        {% if task.comments.count > 0 %}
+                        <span class="comment-count-badge"><i class="fas fa-comment"></i> {{ task.comments.count }}</span>
+                        {% endif %}
+                        <a href="/projects/{{ workspace.slug }}/{{ project.slug }}/comment/{{ task.id }}/" class="btn-icon btn-reply" title="View/Add Comments"><i class="fas fa-reply"></i> Reply</a>
+                        <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon" title="Delete"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 <!-- Comments Section -->
@@ -199,7 +203,7 @@
                     {% with root_comments=task.comments.all|dictsort:"created_at" %}
                     {% if root_comments %}
                     <div class="comments-header">
-                        <span class="comments-count">💬 {{ task.comments.count }} Comments</span>
+                        <span class="comments-count"><i class="fas fa-comment"></i> {{ task.comments.count }} Comments</span>
                     </div>
                     <div class="comments-list" id="comments-{{ task.id }}">
                         {% for comment in root_comments %}
@@ -223,7 +227,7 @@
                     {% with total_root=task.comments.all|length %}
                     {% if total_root > 1 %}
                     <a href="{% url 'view_comment_details' workspace.slug project.slug task.id %}" class="view-all-comments-btn">
-                        👁️ View All {{ total_root }} Comments
+                        <i class="fas fa-eye"></i> View All {{ total_root }} Comments
                     </a>
                     {% endif %}
                     {% endwith %}
@@ -240,10 +244,10 @@
         </div>
         {% else %}
         <div class="empty-state-small">
-            <div class="empty-icon">📝</div>
+            <div class="empty-icon"><i class="fas fa-clipboard-list" style="font-size: 48px;"></i></div>
             <h3>No Tasks Yet</h3>
             <p>Create your first task to start tracking work on this project.</p>
-            <button class="btn btn-primary" style="margin-top: 16px;">➕ Create First Task</button>
+            <button class="btn btn-primary" style="margin-top: 16px;"><i class="fas fa-plus"></i> Create First Task</button>
         </div>
         {% endif %}
     </div>

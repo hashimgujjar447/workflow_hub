@@ -12,7 +12,7 @@
     <!-- Workspace Header -->
     <div class="detail-header">
         <div class="header-left">
-            <div class="workspace-icon-large">🏢</div>
+            <div class="workspace-icon-large"><i class="fas fa-building"></i></div>
             <div class="header-info">
                 <h1>{{ workspace.name }}</h1>
                 <p class="workspace-meta">
@@ -21,44 +21,44 @@
                 </p>
                 <div class="status-badges">
                     {% if workspace.is_active %}
-                        <span class="badge badge-success">🟢 Active</span>
+                        <span class="badge badge-success"><i class="fas fa-circle" style="color: #10b981;"></i> Active</span>
                     {% else %}
-                        <span class="badge badge-inactive">⚫ Inactive</span>
+                        <span class="badge badge-inactive"><i class="fas fa-circle" style="color: #6b7280;"></i> Inactive</span>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="header-actions">
-            <a href="{% url 'workspace_settings' workspace.slug %}" class="btn btn-secondary">⚙️ Settings</a>
-            <button class="btn btn-primary">➕ Invite Members</button>
+            <a href="{% url 'workspace_settings' workspace.slug %}" class="btn btn-secondary"><i class="fas fa-cog"></i> Settings</a>
+            <button class="btn btn-primary"><i class="fas fa-plus"></i> Invite Members</button>
         </div>
     </div>
 
     <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
             <div class="stat-content">
                 <h3>{{ total_members }}</h3>
                 <p>Total Members</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📁</div>
+            <div class="stat-icon"><i class="fas fa-folder"></i></div>
             <div class="stat-content">
                 <h3>{{ total_projects }}</h3>
                 <p>Total Projects</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><i class="fas fa-calendar"></i></div>
             <div class="stat-content">
                 <h3>{{ workspace.created_at|timesince }}</h3>
                 <p>Workspace Age</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📊</div>
+            <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
             <div class="stat-content">
                 <h3>{% if workspace.is_active %}Active{% else %}Inactive{% endif %}</h3>
                 <p>Status</p>
@@ -69,7 +69,7 @@
     <!-- Members Section -->
     <div class="section-card">
         <div class="section-header">
-            <h2>👥 Workspace Members ({{ total_members }})</h2>
+            <h2><i class="fas fa-users"></i> Workspace Members ({{ total_members }})</h2>
             {% if is_creator %}
             <a class="btn btn-sm btn-primary" href="{% url 'add_member' workspace.slug %}">+ Add Member</a>
             {% endif %}
@@ -103,7 +103,7 @@
     <!-- Projects Section -->
     <div class="section-card">
         <div class="section-header">
-            <h2>📁 Projects ({{ total_projects }})</h2>
+            <h2><i class="fas fa-folder"></i> Projects ({{ total_projects }})</h2>
             {% if is_allow_to_create_project %}
  <a href="{% url 'create_workspace_project' workspace.slug %}" class="btn btn-sm btn-primary">+ Create Project</a>
             {% endif %}
@@ -145,7 +145,7 @@
         </div>
         {% else %}
         <div class="empty-state-small">
-            <div class="empty-icon">📂</div>
+            <div class="empty-icon"><i class="fas fa-folder-open" style="font-size: 48px;"></i></div>
             <p>No projects yet. Create your first project to get started.</p>
         </div>
         {% endif %}

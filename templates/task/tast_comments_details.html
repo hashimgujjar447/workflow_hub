@@ -16,7 +16,7 @@
 
     <!-- Task Header -->
     <div class="task-header-card">
-        <div class="task-icon">📋</div>
+        <div class="task-icon"><i class="fas fa-tasks"></i></div>
         <div class="task-header-info">
             <h1>{{ task.title }}</h1>
             {% if task.description %}
@@ -25,7 +25,7 @@
             <div class="task-badges">
                 <span class="badge badge-{{ task.status }}">{{ task.get_status_display }}</span>
                 {% if task.assigned_to %}
-                <span class="badge badge-assignee">👤 {{ task.assigned_to.member.first_name }}</span>
+                <span class="badge badge-assignee"><i class="fas fa-user"></i> {{ task.assigned_to.member.first_name }}</span>
                 {% endif %}
             </div>
         </div>
@@ -34,7 +34,7 @@
     <!-- Comments Section -->
     <div class="all-comments-section">
         <div class="comments-section-header">
-            <h2>💬 All Comments ({{ task.comments.count }})</h2>
+            <h2><i class="fas fa-comment"></i> All Comments ({{ task.comments.count }})</h2>
         </div>
 
         <div class="comments-thread">
@@ -54,7 +54,7 @@
     <div class="add_comment_model">
         <div class="comment-modal-content">
             <div class="comment-modal-header">
-                <h2>💬 Add New Comment</h2>
+                <h2><i class="fas fa-comment"></i> Add New Comment</h2>
                 <button type="button" class="close-modal-btn">&times;</button>
             </div>
             <form id="comment-form" method="POST" action="{% url 'view_comment_details' task.project.workspace.slug task.project.slug task.id %}">

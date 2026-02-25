@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Task
 from workspaces.models import Workspace
 from projects.models import Project, ProjectMember
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 
 
 @login_required
@@ -17,6 +17,8 @@ def get_all_tasks(request):
             queryset=Task.objects.select_related(
                 "assigned_to",
                 "created_by"
+            ).annotate(
+                comment_count=Count('comments')
             )
         )
     ).distinct()

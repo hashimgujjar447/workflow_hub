@@ -4,7 +4,7 @@
 <div class="tasks-page">
     <div class="page-header">
         <div class="header-content">
-            <h1>📋 My Tasks</h1>
+            <h1><i class="fas fa-tasks"></i> My Tasks</h1>
             <p class="subtitle">Track and manage your work across all projects</p>
         </div>
     </div>
@@ -41,7 +41,7 @@
                 <!-- Assigned Tasks -->
                 <div class="tasks-column assigned">
                     <div class="column-header">
-                        <span class="column-icon">👤</span>
+                        <span class="column-icon"><i class="fas fa-user"></i></span>
                         <h3>Assigned to Me</h3>
                     </div>
                     
@@ -50,7 +50,7 @@
                         <div class="task-card">
                             <div class="task-card-top">
                                 <span class="status-badge status-{{ task.status }}">
-                                    {% if task.status == 'todo' %}📝{% elif task.status == 'in_progress' %}🔄{% elif task.status == 'review' %}👁️{% else %}✅{% endif %}
+                                    {% if task.status == 'todo' %}<i class="fas fa-clipboard-list"></i>{% elif task.status == 'in_progress' %}<i class="fas fa-spinner"></i>{% elif task.status == 'review' %}<i class="fas fa-eye"></i>{% else %}<i class="fas fa-check-circle"></i>{% endif %}
                                     {{ task.get_status_display }}
                                 </span>
                                 {% if task.due_date %}
@@ -72,12 +72,22 @@
                                     <div class="avatar">{{ task.created_by.first_name|slice:":1" }}</div>
                                     <span>{{ task.created_by.first_name }}</span>
                                 </div>
+                                <div class="task-actions">
+                                    {% if task.comment_count > 0 %}
+                                    <span class="comment-count">
+                                        <i class="fas fa-comment"></i> {{ task.comment_count }}
+                                    </span>
+                                    {% endif %}
+                                    <a href="/projects/{{ item.project.workspace.slug }}/{{ item.project.slug }}/comment/{{ task.id }}/" class="reply-btn" title="View/Add Comments">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="empty-column">
-                            <span class="empty-icon">🎉</span>
+                            <span class="empty-icon"><i class="fas fa-check-circle"></i></span>
                             <p>No tasks assigned!</p>
                         </div>
                     {% endif %}
@@ -86,7 +96,7 @@
                 <!-- Created Tasks -->
                 <div class="tasks-column created">
                     <div class="column-header">
-                        <span class="column-icon">✨</span>
+                        <span class="column-icon"><i class="fas fa-star"></i></span>
                         <h3>Created by Me</h3>
                     </div>
                     
@@ -95,7 +105,7 @@
                         <div class="task-card">
                             <div class="task-card-top">
                                 <span class="status-badge status-{{ task.status }}">
-                                    {% if task.status == 'todo' %}📝{% elif task.status == 'in_progress' %}🔄{% elif task.status == 'review' %}👁️{% else %}✅{% endif %}
+                                    {% if task.status == 'todo' %}<i class="fas fa-clipboard-list"></i>{% elif task.status == 'in_progress' %}<i class="fas fa-spinner"></i>{% elif task.status == 'review' %}<i class="fas fa-eye"></i>{% else %}<i class="fas fa-check-circle"></i>{% endif %}
                                     {{ task.get_status_display }}
                                 </span>
                                 {% if task.due_date %}
@@ -113,20 +123,32 @@
                             <p class="task-desc">{{ task.description|truncatewords:12 }}</p>
                             {% endif %}
                             <div class="task-footer">
-                                {% if task.assigned_to %}
-                                <div class="assignee">
-                                    <div class="avatar assigned-avatar">{{ task.assigned_to.member.first_name|slice:":1" }}</div>
-                                    <span>{{ task.assigned_to.member.first_name }}</span>
+                                <div>
+                                    {% if task.assigned_to %}
+                                    <div class="assignee">
+                                        <div class="avatar assigned-avatar">{{ task.assigned_to.member.first_name|slice:":1" }}</div>
+                                        <span>{{ task.assigned_to.member.first_name }}</span>
+                                    </div>
+                                    {% else %}
+                                    <span class="unassigned">Unassigned</span>
+                                    {% endif %}
                                 </div>
-                                {% else %}
-                                <span class="unassigned">Unassigned</span>
-                                {% endif %}
+                                <div class="task-actions">
+                                    {% if task.comment_count > 0 %}
+                                    <span class="comment-count">
+                                        <i class="fas fa-comment"></i> {{ task.comment_count }}
+                                    </span>
+                                    {% endif %}
+                                    <a href="/projects/{{ item.project.workspace.slug }}/{{ item.project.slug }}/comment/{{ task.id }}/" class="reply-btn" title="View/Add Comments">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
                         <div class="empty-column">
-                            <span class="empty-icon">📭</span>
+                            <span class="empty-icon"><i class="fas fa-inbox"></i></span>
                             <p>No tasks created yet</p>
                         </div>
                     {% endif %}
@@ -136,7 +158,7 @@
         {% endfor %}
     {% else %}
         <div class="empty-state">
-            <div class="empty-illustration">🚀</div>
+            <div class="empty-illustration"><i class="fas fa-rocket" style="font-size: 64px;"></i></div>
             <h2>Welcome to Tasks!</h2>
             <p>You're not part of any project yet. Join a project to start tracking tasks.</p>
         </div>
@@ -373,8 +395,43 @@
     .task-footer {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         padding-top: 12px;
         border-top: 1px solid #f1f5f9;
+    }
+
+    .task-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .comment-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .reply-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 12px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .reply-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
     }
 
     .creator, .assignee {

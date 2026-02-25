@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; padding: 60px 20px;">
+    <h1 style="font-size: 72px; color: #e74c3c; margin: 0;">403</h1>
+    <h2 style="color: #666; margin: 20px 0;">Access Forbidden</h2>
+    <p style="color: #888; font-size: 18px; margin: 20px 0;">
+        You don't have permission to access this resource.
+    </p>
+    <p style="color: #888; font-size: 16px;">
+        You must be a member of this project to perform this action.
+    </p>
+    <div style="margin-top: 40px;">
+        <a href="{% url 'home' %}" style="display: inline-block; padding: 12px 24px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px;">
+            Go to Dashboard
+        </a>
+        <a href="{% url 'workspaces' %}" style="display: inline-block; padding: 12px 24px; background-color: #95a5a6; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px;">
+            View Workspaces
+        </a>
+    </div>
+</div>
+{% endblock %}
