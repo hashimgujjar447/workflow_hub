@@ -4,7 +4,7 @@ from api.serializers.common_serializers import UserSerializer
 
 
 class WorkSpaceMemberSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    
 
     class Meta:
         model = WorkspaceMember

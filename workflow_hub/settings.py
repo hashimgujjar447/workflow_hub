@@ -86,8 +86,12 @@ WSGI_APPLICATION = 'workflow_hub.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'workflow_db',
+        'USER':'postgres',
+        'PASSWORD':'hashim123',
+        'HOST':'localhost',
+        'PORT':'5432'
     }
 }
 

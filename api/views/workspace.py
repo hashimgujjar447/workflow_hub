@@ -10,7 +10,7 @@ class ListCreateWorkspaceView(generics.ListCreateAPIView):
 
     def get_queryset(self):
       
-        return Workspace.objects.filter(creator=self.request.user).annotate(
+        return Workspace.objects.filter(Q(creator=self.request.user) | Q(members__user=self.request.user)).annotate(
             total_members=Count('members', distinct=True),
             total_projects=Count('projects', distinct=True)
         ).order_by('-created_at')
