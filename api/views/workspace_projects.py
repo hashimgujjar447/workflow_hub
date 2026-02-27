@@ -4,10 +4,12 @@ from api.serializers.workspace_projects import WorkspaceProjectSerializer,Worksp
 from django.db.models import Q
 from django.utils.text import slugify
 from workspaces.models import Workspace
+
 from django.db.models import Count
 from tasks.models import Task
 from api.serializers.task_serializers import ProjectTaskSerializer
 from rest_framework import permissions
+from api.permissions import IsManagerOrLeader
 class WorkspaceProjectApiView(generics.ListCreateAPIView):
       queryset=Project.objects.all()
       serializer_class=WorkspaceProjectSerializer
@@ -18,7 +20,23 @@ class WorkspaceProjectApiView(generics.ListCreateAPIView):
             return qs.filter(workspace__slug=slug)
       def perform_create(self, serializer):
             workspace=Workspace.objects.get(slug=self.kwargs["workspace_slug"])
-            serializer.save(workspace=workspace)
+            
+            serializer.save(workspace=workspace,created_by=self.request.user)
+            project = serializer.save(
+            workspace=workspace,
+            created_by=self.request.user
+        )
+
+            # ✅ Automatically add creator as Project Manager
+            ProjectMember.objects.create(
+                project=project,
+                member=self.request.user,
+                role=ProjectMember.ROLE_MANAGER  # auto manager
+            )
+
+           
+
+            
       
      
 
@@ -26,10 +44,12 @@ class WorkspaceProjectApiView(generics.ListCreateAPIView):
 class WorkspaceProjectDetailsApiView(generics.RetrieveUpdateDestroyAPIView):
      
       serializer_class=WorkspaceProjectDetailSerializer
-      permission_classes=[permissions.IsAuthenticated]
+      permission_classes=[permissions.IsAuthenticated,IsManagerOrLeader]
      
       lookup_field = "slug"
       lookup_url_kwarg = "project_slug"
+      def get_serializer_class(self):
+           return super().get_serializer_class()
       
       def get_queryset(self):
            return Project.objects.filter(

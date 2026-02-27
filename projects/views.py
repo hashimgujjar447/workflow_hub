@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from workspaces.models import Workspace
+from workspaces.models import Workspace,WorkspaceMember
 from .models import Project, ProjectMember
 from tasks.models import Task
 from comments.models import TaskComment
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+
 
 
 @login_required
@@ -43,6 +44,19 @@ def project_detail(request, workspace_slug, project_slug):
         slug=workspace_slug
     )
     # Get project belonging to this workspace
+    IsMemberAvailabke=Project.objects.filter(workspace__slug=workspace_slug,slug=project_slug).prefetch_related("members")
+
+
+    for p in IsMemberAvailabke:
+        if not p.members.all():
+            print("No mmebers available")
+        for m in p.members.all():
+            if m.member==request.user:
+                print("Yes member")
+            else:
+                print("Not member")    
+
+   
     project = get_object_or_404(
         Project.objects.prefetch_related(
             Prefetch(

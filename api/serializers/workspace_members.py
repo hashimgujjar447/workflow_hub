@@ -8,4 +8,4 @@ class WorkSpaceMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkspaceMember
-        fields = ['user', 'role', 'joined_at', 'is_active']
+        fields = ['member', 'role', 'joined_at', 'is_active']

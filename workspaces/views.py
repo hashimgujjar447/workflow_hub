@@ -171,7 +171,8 @@ def create_workspace_project(request, slug):
                     name=project_name,
                     slug=slugify(f"{workspace.slug}-{project_name}"),
                     status=project_status,
-                    is_active=is_active
+                    is_active=is_active,
+                    created_by=request.user
                 )
 
                 ProjectMember.objects.get_or_create(

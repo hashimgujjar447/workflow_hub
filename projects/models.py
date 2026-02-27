@@ -51,17 +51,21 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
             counter = 1
-            while Workspace.objects.filter(slug=slug).exists():
-                slug=f"{base_slug}-{counter}"
-                counter=counter+1
-            self.slug = slug    
 
-        super().save(*args,**kwargs)
+            while Project.objects.filter(
+                workspace=self.workspace,
+                slug=slug
+            ).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ('workspace', 'slug')
