@@ -1,15 +1,23 @@
 from rest_framework import serializers
-from workspaces.models import Workspace,WorkspaceMember
+from workspaces.models import Workspace, WorkspaceMember
 from django.utils.text import slugify
+from api.serializers.common_serializers import UserSerializer
 
 class WorkspaceMemberSerializer(serializers.ModelSerializer):
+    user_detail = UserSerializer(source='user', read_only=True)
+
     class Meta:
         model=WorkspaceMember
         fields=[
             'user',
+            'user_detail',
+            'role',
             'joined_at',
             'is_active'
         ]
+        extra_kwargs = {
+            'user': {'write_only': True}
+        }
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):

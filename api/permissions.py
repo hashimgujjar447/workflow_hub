@@ -1,6 +1,21 @@
 from rest_framework import permissions
 from workspaces.models import WorkspaceMember
-from projects.models import ProjectMember,Project
+from projects.models import ProjectMember, Project
+
+
+class IsProjectMember(permissions.BasePermission):
+    """Allow access only to active members of the project."""
+
+    def has_permission(self, request, view):
+        workspace_slug = view.kwargs.get("workspace_slug")
+        project_slug = view.kwargs.get("project_slug")
+        return ProjectMember.objects.filter(
+            project__workspace__slug=workspace_slug,
+            project__slug=project_slug,
+            member=request.user,
+            is_active=True
+        ).exists()
+
 
 class IsManager(permissions.BasePermission):
 

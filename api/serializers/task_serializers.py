@@ -13,6 +13,7 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = [
+            'id',
             'title',
             'description',
             'assigned_to',
@@ -23,6 +24,16 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
             'updated_at',
             'comments'
         ]
+
     def get_comments(self, obj):
-        parent_comment=obj.comments.filter(parent_comment__isnull=True).select_related('author')[:1]
-        return CommentSerializer(parent_comment,many=True).data    
+        parent_comment = obj.comments.filter(parent_comment__isnull=True).select_related('author')[:1]
+        return CommentSerializer(parent_comment, many=True).data
+
+
+class CreateTaskSerializer(serializers.ModelSerializer):
+    """Used for creating and updating tasks. assigned_to accepts ProjectMember pk."""
+
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'assigned_to', 'status', 'due_date']
+        read_only_fields = ['id']

@@ -11,4 +11,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskComment
-        fields = [ 'author', 'content', 'created_at', 'updated_at','parent_comment']
+        fields = ['id', 'author', 'content', 'created_at', 'updated_at', 'parent_comment']
+        extra_kwargs = {
+            'parent_comment': {'required': False, 'allow_null': True}
+        }
