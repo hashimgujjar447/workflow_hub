@@ -37,8 +37,8 @@
         <div class="header-actions">
             {% if is_allow_to_delete_and_create %}
             <a href="{% url 'project_settings' workspace.slug project.slug %}" class="btn btn-secondary"><i class="fas fa-cog"></i> Settings</a>
+            <a href="{% url 'add_project_task' workspace.slug project.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Task</a>
             {% endif %}
-            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Task</button>
         </div>
     </div>
 
@@ -135,7 +135,9 @@
     <div class="section-card">
         <div class="section-header">
             <h2><i class="fas fa-tasks"></i> Tasks ({{ total_tasks }})</h2>
+            {% if is_allow_to_delete_and_create %}
             <a href="{% url 'add_project_task' workspace.slug project.slug %}" class="btn btn-sm btn-primary">+ Add New Task</a>
+            {% endif %}
         </div>
         
         {% if tasks %}
@@ -193,9 +195,11 @@
                         {% if task.comments.count > 0 %}
                         <span class="comment-count-badge"><i class="fas fa-comment"></i> {{ task.comments.count }}</span>
                         {% endif %}
-                        <a href="/projects/{{ workspace.slug }}/{{ project.slug }}/comment/{{ task.id }}/" class="btn-icon btn-reply" title="View/Add Comments"><i class="fas fa-reply"></i> Reply</a>
+                        <a href="{% url 'view_comment_details' workspace.slug project.slug task.id %}" class="btn-icon btn-reply" title="View/Add Comments"><i class="fas fa-reply"></i> Reply</a>
+                        {% if is_allow_to_delete_and_create %}
                         <button class="btn-icon" title="Edit"><i class="fas fa-edit"></i></button>
                         <button class="btn-icon" title="Delete"><i class="fas fa-trash"></i></button>
+                        {% endif %}
                     </div>
                 </div>
                 <!-- Comments Section -->
@@ -209,10 +213,10 @@
                         {% for comment in root_comments %}
                         {% if not comment.parent_comment %}
                         <div class="comment-item {% if forloop.counter > 1 %}hidden-comment{% endif %}" data-visible="{% if forloop.counter <= 2 %}true{% else %}false{% endif %}">
-                            <div class="comment-avatar">{{ comment.user.first_name|first|upper }}{{ comment.user.last_name|first|upper }}</div>
+                            <div class="comment-avatar">{{ comment.author.first_name|first|upper }}{{ comment.author.last_name|first|upper }}</div>
                             <div class="comment-body">
                                 <div class="comment-header">
-                                    <span class="comment-author">{{ comment.user.first_name }} {{ comment.user.last_name }}</span>
+                                    <span class="comment-author">{{ comment.author.first_name }} {{ comment.author.last_name }}</span>
                                     <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
                                 </div>
                                 <p class="comment-content">{{ comment.content }}</p>

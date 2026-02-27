@@ -29,8 +29,12 @@
             </div>
         </div>
         <div class="header-actions">
+            {% if is_manager %}
             <a href="{% url 'workspace_settings' workspace.slug %}" class="btn btn-secondary"><i class="fas fa-cog"></i> Settings</a>
-            <button class="btn btn-primary"><i class="fas fa-plus"></i> Invite Members</button>
+            {% endif %}
+            {% if is_creator or is_manager %}
+            <a href="{% url 'add_member' workspace.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Invite Members</a>
+            {% endif %}
         </div>
     </div>
 

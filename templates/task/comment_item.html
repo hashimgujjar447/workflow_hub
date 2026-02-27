@@ -1,11 +1,11 @@
 <div id="{{ comment.id }}" class="comment-thread-item {% if is_reply %}is-reply{% endif %}">
     <div class="comment-main">
         <div class="comment-avatar {% if is_reply %}reply-avatar{% endif %}">
-            {{ comment.user.first_name|first|upper }}{{ comment.user.last_name|first|upper }}
+            {{ comment.author.first_name|first|upper }}{{ comment.author.last_name|first|upper }}
         </div>
         <div class="comment-content-box">
             <div class="comment-meta">
-                <span class="comment-author-name">{{ comment.user.first_name }} {{ comment.user.last_name }}</span>
+                <span class="comment-author-name">{{ comment.author.first_name }} {{ comment.author.last_name }}</span>
                 <span class="comment-timestamp">{{ comment.created_at|timesince }} ago</span>
             </div>
             <p class="comment-text">{{ comment.content }}</p>

@@ -73,7 +73,12 @@ def create_workspace(request):
 
 @login_required
 def workspace_detail(request, slug):
-    workspace = get_object_or_404(Workspace.objects.prefetch_related("members"), slug=slug)
+    workspace = get_object_or_404(
+        Workspace.objects.prefetch_related("members").distinct(),
+        Q(creator=request.user) | Q(members__user=request.user),
+        slug=slug,
+        is_active=True
+    )
     
     # Get workspace members
     members = workspace.members.select_related('user').all()
@@ -81,6 +86,7 @@ def workspace_detail(request, slug):
     # Get workspace projects
     projects = workspace.projects.all()
     is_creator=request.user==workspace.creator
+    is_manager = workspace.members.filter(user=request.user, role='manager', is_active=True).exists()
     
     context = {
         'workspace': workspace,
@@ -89,6 +95,7 @@ def workspace_detail(request, slug):
         'total_members': members.count(),
         'total_projects': projects.count(),
         'is_creator':is_creator,
+        'is_manager': is_manager,
         'is_allow_to_create_project':workspace.members.filter(user=request.user,role__in=['leader','manager'],is_active=True).exists()
         
     }
@@ -98,6 +105,12 @@ def workspace_detail(request, slug):
 @login_required
 def add_member_in_workspace(request,slug):
     workspace = get_object_or_404(Workspace, slug=slug)
+
+    # Only workspace creator or manager can add members
+    is_manager = workspace.members.filter(user=request.user, role='manager', is_active=True).exists()
+    is_creator = request.user == workspace.creator
+    if not (is_creator or is_manager):
+        raise PermissionDenied("You don't have permission to add members to this workspace.")
 
     if request.method=="POST":
         member_id = request.POST.get('member_id')

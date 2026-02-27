@@ -99,7 +99,7 @@ def project_detail(request, workspace_slug, project_slug):
         'completed_tasks': completed_tasks,
         'in_progress_tasks': in_progress_tasks,
         'todo_tasks': todo_tasks,
-        'is_allow_to_delete_and_create':project.members.filter( member=request.user,role__in=['leader','manager'],is_active=True)
+        'is_allow_to_delete_and_create':project.members.filter( member=request.user,role__in=['leader','manager'],is_active=True).exists()
     }
    
     

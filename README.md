@@ -89,14 +89,16 @@ Account (User)
 ### Dependencies
 
 ```
+asgiref==3.11.0
 Django==6.0.1
-djangorestframework
-djangorestframework-simplejwt
-django-debug-toolbar
-psycopg2-binary
-asgiref
-sqlparse
-tzdata
+django-debug-toolbar==6.2.0
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
+psycopg2-binary==2.9.11
+PyJWT==2.11.0
+pyparsing==3.3.2
+sqlparse==0.5.5
+tzdata==2025.3
 ```
 
 ---
@@ -614,11 +616,7 @@ source env/bin/activate
 
 **3. Install dependencies**
 ```bash
-pip install django==6.0.1
-pip install djangorestframework
-pip install djangorestframework-simplejwt
-pip install django-debug-toolbar
-pip install psycopg2-binary
+pip install -r requirements.txt
 ```
 
 **4. Set up PostgreSQL database**
@@ -768,7 +766,102 @@ curl -X POST http://127.0.0.1:8000/api/token/refresh/ \
 
 ---
 
-## 🔜 Roadmap
+## � Production Deployment
+
+> ⚠️ **The project is NOT production-ready in its current state.** The following changes are required before hosting.
+
+### ❌ What Must Be Fixed Before Hosting
+
+| Issue | Current Value | Required Fix |
+|---|---|---|
+| `DEBUG` | `True` | Set to `False` |
+| `SECRET_KEY` | Hardcoded insecure key | Use environment variable |
+| `ALLOWED_HOSTS` | `[]` (empty) | Add your domain e.g. `['yourdomain.com']` |
+| DB credentials | Hardcoded in settings | Move to environment variables |
+| `CSRF_TRUSTED_ORIGINS` | localhost only | Add production domain |
+| `debug_toolbar` | Always loaded | Disable in production |
+| Static files | Not collected | Run `collectstatic` |
+| WSGI server | Dev server | Use `gunicorn` |
+
+### ✅ Step-by-Step Production Checklist
+
+**1. Install production dependencies**
+```bash
+pip install gunicorn
+pip install whitenoise
+pip install python-decouple   # for .env file support
+```
+
+**2. Create a `.env` file in project root**
+```env
+SECRET_KEY=your-very-long-random-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+DB_NAME=workflow_db
+DB_USER=postgres
+DB_PASSWORD=your_db_password
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+**3. Update `settings.py` for production**
+```python
+from decouple import config
+
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+    }
+}
+
+# Whitenoise for static files
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add after SecurityMiddleware
+    # ... rest of middleware
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Remove debug_toolbar from INSTALLED_APPS and MIDDLEWARE in production
+```
+
+**4. Collect static files**
+```bash
+python manage.py collectstatic --noinput
+```
+
+**5. Run database migrations**
+```bash
+python manage.py migrate
+```
+
+**6. Start with Gunicorn**
+```bash
+gunicorn workflow_hub.wsgi:application --bind 0.0.0.0:8000
+```
+
+### 🌐 Hosting Platforms
+
+| Platform | Notes |
+|---|---|
+| **Railway** | Easy PostgreSQL + Django deploy, supports `requirements.txt` |
+| **Render** | Free tier available, add `gunicorn` start command |
+| **Heroku** | Needs `Procfile`: `web: gunicorn workflow_hub.wsgi` |
+| **DigitalOcean App Platform** | Good for production, supports env vars |
+| **VPS (Ubuntu)** | Full control — use Nginx + Gunicorn + systemd |
+
+---
+
+## �🔜 Roadmap
 
 - [x] Custom user authentication (email-based)
 - [x] Workspace management with role system
@@ -777,8 +870,16 @@ curl -X POST http://127.0.0.1:8000/api/token/refresh/ \
 - [x] Threaded comments with nested replies
 - [x] REST API with JWT + Session auth
 - [x] Soft delete for workspaces and projects
-- [x] Custom `IsManager` permission
+- [x] Custom `IsManager`, `IsManagerOrLeader`, `IsProjectMember` permissions
 - [x] Django Debug Toolbar integration
+- [x] Fixed: `comment.author` field used correctly across templates
+- [x] Fixed: Role values matched to `ROLE_CHOICES` in add member forms
+- [x] Fixed: `is_allow_to_delete_and_create` returns proper boolean
+- [x] Fixed: Workspace detail access-gated to members only
+- [x] Fixed: Workspace `add_member` requires manager/creator permission
+- [x] Fixed: Hardcoded URLs replaced with `{% url %}` tags
+- [ ] `requirements.txt` added ✅ (done)
+- [ ] Production environment setup (`.env`, gunicorn, whitenoise)
 - [ ] Email notifications on task assignment
 - [ ] File attachments on tasks
 - [ ] Real-time updates (Django Channels / WebSockets)
