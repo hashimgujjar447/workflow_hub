@@ -17,6 +17,7 @@ class ListCreateWorkspaceMembersApiView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         workspace=Workspace.objects.get(slug=self.kwargs['workspace_slug'])
         serializer.save(workspace=workspace)
+        
     
 
     

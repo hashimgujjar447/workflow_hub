@@ -4,6 +4,7 @@ from api.serializers.workspace_projects import WorkspaceProjectSerializer,Worksp
 from django.db.models import Q
 from django.utils.text import slugify
 from workspaces.models import Workspace
+from api.serializers.project_member_serializer import ProjectMemberSerializer
 
 from django.db.models import Count
 from tasks.models import Task
@@ -82,3 +83,21 @@ class ProjectTasksApiView(generics.ListAPIView):
 
         )
                 
+class ProjectMembersApiView(generics.ListCreateAPIView):
+     queryset=ProjectMember.objects.all()
+     serializer_class=ProjectMemberSerializer
+     permission_classes=[permissions.IsAuthenticated,IsManagerOrLeader]  
+
+         
+
+     def get_queryset(self):
+          project_slug=self.kwargs["project_slug"]
+          workspace_slug=self.kwargs["workspace_slug"]
+          
+          return ProjectMember.objects.filter(project__slug=project_slug,project__workspace__slug=workspace_slug,is_active=True)
+     def perform_create(self, serializer):
+            project_slug=self.kwargs["project_slug"]
+            workspace_slug=self.kwargs["workspace_slug"]
+            project=Project.objects.get(slug=project_slug,workspace__slug=workspace_slug)
+            serializer.save(project=project)
+          
