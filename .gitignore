@@ -55,5 +55,3 @@ wheels/
 # Django stuff
 *.mo
 *.pot
-/static/
-/media/
