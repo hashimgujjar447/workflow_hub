@@ -30,6 +30,7 @@ urlpatterns = [
     path('',views.home , name="home"),
     path('accounts/', include('accounts.urls')),
     path('workspace/',include('workspaces.urls')),
+    path('invitations/', include('invitations.urls')),
     path('projects/',include('projects.urls')),
     path('tasks/',include('tasks.urls')),
     path('api/',include('api.urls')),
