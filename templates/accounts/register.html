@@ -161,6 +161,7 @@
             
             <form method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -198,7 +199,7 @@
             </form>
             
             <div class="auth-footer">
-                Already have an account? <a href="{% url 'login' %}">Login</a>
+                Already have an account? <a href="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}">Login</a>
             </div>
         </div>
     </div>

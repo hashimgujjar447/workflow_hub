@@ -144,6 +144,7 @@
             
             <form method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
                 
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -159,7 +160,7 @@
             </form>
             
             <div class="auth-footer">
-                Don't have an account? <a href="{% url 'register' %}">Register</a>
+                Don't have an account? <a href="{% url 'register' %}{% if next %}?next={{ next }}{% endif %}">Register</a>
             </div>
         </div>
     </div>

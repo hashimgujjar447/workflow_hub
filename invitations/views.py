@@ -62,7 +62,7 @@ def send_invite(request, slug):
             role=role
         )
         invite_link = request.build_absolute_uri(
-            reverse("accept_invite", args=[invite.token])
+            reverse("all_invites")
         )
 
         send_mail(
@@ -72,7 +72,7 @@ def send_invite(request, slug):
 
         You have been invited to join {workspace.name}.
 
-        Click below to accept:
+        Click below to visit invites:
         {invite_link}
 
         This link expires in 7 days.
@@ -88,46 +88,47 @@ def send_invite(request, slug):
     })
 
 @login_required
-def accept_invite(request,token):
-    invite=get_object_or_404(
-        WorkspaceInvite,
-        token=token,
+def get_invites(request):
+    invites = WorkspaceInvite.objects.filter(
+        email=request.user.email,
         status="pending"
     )
-    
-    if invite.email.lower() != request.user.email.lower():
-        raise PermissionDenied
-    if invite.is_expired():
-        invite.status = "expired"
-        invite.save()
-        raise PermissionDenied("Invite expired.")
-    WorkspaceMember.objects.get_or_create(
-        workspace=invite.workspace,
-        user=request.user,
-        defaults={"role": invite.role}
-    )
 
-    invite.status = "accepted"
-    invite.save()
+    if request.method == "POST":
+        action = request.POST.get("action")
+        token = request.POST.get("token")
 
-    return redirect("workspaces")
-       
-@login_required
-def reject_invite(request,token):
-    invite=get_object_or_404(
-        WorkspaceInvite,
-        token=token,
-        status="pending"
-    )
-    if invite.is_expired():
-        invite.status = "expired"
-        invite.save()
-        raise PermissionDenied("Invite expired.")
-    if invite.email !=request.user.email:
-        raise PermissionDenied
+        invite = get_object_or_404(
+            WorkspaceInvite,
+            token=token,
+            status="pending"
+        )
 
-    invite.status = "rejected"
-    invite.save()
+        # 🔒 Security check
+        if invite.email.lower() != request.user.email.lower():
+            raise PermissionDenied("This invite is not for you.")
 
-    return redirect("workspaces")
-              
+        if invite.is_expired():
+            invite.status = "expired"
+            invite.save()
+            raise PermissionDenied("Invite expired.")
+
+        if action == "accept":
+            WorkspaceMember.objects.get_or_create(
+                workspace=invite.workspace,
+                user=request.user,
+                defaults={"role": invite.role}
+            )
+
+            invite.status = "accepted"
+            invite.save()
+
+        elif action == "reject":
+            invite.status = "rejected"
+            invite.save()
+
+        return redirect("workspaces")
+
+    return render(request, 'invitations/all_invites.html', {
+        'invites': invites
+    })

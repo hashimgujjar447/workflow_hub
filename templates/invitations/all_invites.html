@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="invites-page">
+
+  <!-- Page Header -->
+  <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; padding-bottom:24px; border-bottom:2px solid var(--border-color);">
+    <div>
+      <h1><i class="fas fa-envelope-open-text"></i> Workspace Invitations</h1>
+      <p>Review and respond to your pending workspace invites</p>
+    </div>
+    {% if invites %}
+    <div class="invites-count-badge">
+      <i class="fas fa-bell"></i>
+      {{ invites|length }} Pending
+    </div>
+    {% endif %}
+  </div>
+
+  {% if invites %}
+  <div class="invites-list">
+
+    {% for invite in invites %}
+    <div class="invite-item">
+
+      <!-- Workspace Icon -->
+      <div class="invite-workspace-icon">
+        <i class="fas fa-building"></i>
+      </div>
+
+      <!-- Invite Info -->
+      <div class="invite-info">
+        <h3 class="invite-workspace-name">{{ invite.workspace.name }}</h3>
+
+        <div class="invite-meta">
+          <span class="invite-role-badge invite-role-badge--{{ invite.role }}">
+            {% if invite.role == "manager" %}
+              <i class="fas fa-crown"></i>
+            {% elif invite.role == "leader" %}
+              <i class="fas fa-star"></i>
+            {% else %}
+              <i class="fas fa-user"></i>
+            {% endif %}
+            {{ invite.role|title }}
+          </span>
+
+          <span class="invite-date">
+            <i class="fas fa-clock"></i>
+            {{ invite.created_at|date:"M d, Y" }}
+          </span>
+        </div>
+
+        <p class="invite-from">
+          Invited by <strong>{{ invite.invited_by.get_full_name|default:invite.invited_by.username }}</strong>
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="invite-actions">
+
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="token" value="{{ invite.token }}">
+          <input type="hidden" name="action" value="accept">
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="fas fa-check"></i> Accept
+          </button>
+        </form>
+
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="token" value="{{ invite.token }}">
+          <input type="hidden" name="action" value="reject">
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="fas fa-times"></i> Reject
+          </button>
+        </form>
+
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fas fa-envelope-open"></i></div>
+    <h3>No Pending Invitations</h3>
+    <p>You're all caught up! No workspace invites are waiting for you.</p>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
