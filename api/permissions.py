@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from workspaces.models import WorkspaceMember
+from workspaces.models import Workspace, WorkspaceMember
 from projects.models import ProjectMember, Project
 
 
@@ -25,6 +25,12 @@ class IsManager(permissions.BasePermission):
             return True
 
         workspace_slug = view.kwargs.get("workspace_slug")
+        if not workspace_slug:
+            return False
+
+        # Workspace creator always has manager-level access
+        if Workspace.objects.filter(slug=workspace_slug, creator=request.user).exists():
+            return True
 
         try:
             member = WorkspaceMember.objects.get(
@@ -59,12 +65,15 @@ class IsManagerOrLeader(permissions.BasePermission):
 
         # -----------------------------
         # ✅ WRITE METHODS
-        # Allow only manager or leader in Workspace
+        # Allow only manager or leader in Workspace (or workspace creator)
         # -----------------------------
+        if Workspace.objects.filter(slug=workspace_slug, creator=request.user).exists():
+            return True
+
         try:
             workspace_member = WorkspaceMember.objects.get(
                 workspace__slug=workspace_slug,
-                user=request.user,     # 👈 correct field
+                user=request.user,
                 is_active=True
             )
         except WorkspaceMember.DoesNotExist:

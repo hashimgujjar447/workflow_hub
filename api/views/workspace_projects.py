@@ -10,6 +10,7 @@ from tasks.models import Task
 from api.serializers.task_serializers import ProjectTaskSerializer, CreateTaskSerializer
 from rest_framework import permissions
 from api.permissions import IsManagerOrLeader, IsProjectMember
+from django.shortcuts import get_object_or_404
 
 
 class WorkspaceProjectApiView(generics.ListCreateAPIView):
@@ -19,11 +20,15 @@ class WorkspaceProjectApiView(generics.ListCreateAPIView):
 
       def get_queryset(self):
             slug = self.kwargs['workspace_slug']
-            qs = super().get_queryset()
-            return qs.filter(workspace__slug=slug)
+            return Project.objects.filter(
+                workspace__slug=slug
+            ).filter(
+                Q(workspace__creator=self.request.user) |
+                Q(workspace__members__user=self.request.user)
+            ).distinct()
 
       def perform_create(self, serializer):
-            workspace = Workspace.objects.get(slug=self.kwargs["workspace_slug"])
+            workspace = get_object_or_404(Workspace, slug=self.kwargs["workspace_slug"])
             project = serializer.save(
                 workspace=workspace,
                 created_by=self.request.user
@@ -78,7 +83,8 @@ class ProjectTasksApiView(generics.ListCreateAPIView):
       def perform_create(self, serializer):
             workspace_slug = self.kwargs["workspace_slug"]
             project_slug = self.kwargs["project_slug"]
-            project = Project.objects.get(
+            project = get_object_or_404(
+                Project,
                 slug=project_slug,
                 workspace__slug=workspace_slug
             )
@@ -102,5 +108,5 @@ class ProjectMembersApiView(generics.ListCreateAPIView):
      def perform_create(self, serializer):
             project_slug = self.kwargs["project_slug"]
             workspace_slug = self.kwargs["workspace_slug"]
-            project = Project.objects.get(slug=project_slug, workspace__slug=workspace_slug)
+            project = get_object_or_404(Project, slug=project_slug, workspace__slug=workspace_slug)
             serializer.save(project=project)
