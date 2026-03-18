@@ -20,10 +20,9 @@ from django.urls import path,include
 from . import views
 from django.conf import settings
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+
+from api.views.refresh_token_obtain import CustomTokenRefreshView
+from api.views.custom_token_obtain import CustomTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,8 +33,8 @@ urlpatterns = [
     path('projects/',include('projects.urls')),
     path('tasks/',include('tasks.urls')),
     path('api/',include('api.urls')),
-     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
+     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh')
 ]
 
 
