@@ -5,10 +5,12 @@ from api.views.workspace_projects import WorkspaceProjectApiView,WorkspaceProjec
 from api.views.task_comments import TaskCommentsAPIView
 from django.urls import path
 from api.views.project_task_details import RetrieveTaskApiView
+from api.views.profile import ProfileView
 
 
 
 urlpatterns = [
+    path('profile/',ProfileView.as_view()),
     path('workspaces/', ListCreateWorkspaceView.as_view()),
 
     path('workspaces/<slug:workspace_slug>/', WorkSpaceDetailView.as_view()),
