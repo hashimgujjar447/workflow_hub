@@ -37,3 +37,19 @@ class CreateTaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ['id', 'title', 'description', 'assigned_to', 'status', 'due_date']
         read_only_fields = ['id']
+
+
+class DashboardTaskSerializer(serializers.ModelSerializer):
+    assigned_to_name = serializers.CharField(source='assigned_to.user.username', read_only=True)
+    project_name = serializers.CharField(source='project.name', read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            'id',
+            'title',
+            'status',
+            'due_date',
+            'assigned_to_name',
+            'project_name',
+        ]

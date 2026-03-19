@@ -7,12 +7,15 @@ from django.urls import path
 from api.views.project_task_details import RetrieveTaskApiView
 from api.views.profile import ProfileView
 
+from api.views.get_all_tasks import DashboardTasksView
+
 
 
 urlpatterns = [
     path('profile/',ProfileView.as_view()),
     path('workspaces/', ListCreateWorkspaceView.as_view()),
-
+     path('dashboard_tasks/',DashboardTasksView.as_view() ),
+    
     path('workspaces/<slug:workspace_slug>/', WorkSpaceDetailView.as_view()),
 
     path('workspaces/<slug:workspace_slug>/members/',
