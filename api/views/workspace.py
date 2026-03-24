@@ -7,7 +7,7 @@ from api.permissions import IsManager
 from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
 class ListCreateWorkspaceView(generics.ListCreateAPIView):
-   
+
     serializer_class=WorkspaceSerializer
     permission_classes=[permissions.IsAuthenticated]
 
