@@ -6,6 +6,7 @@ from rest_framework import permissions
 from api.permissions import IsManager
 from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 class ListCreateWorkspaceView(generics.ListCreateAPIView):
 
     serializer_class=WorkspaceSerializer
@@ -18,7 +19,14 @@ class ListCreateWorkspaceView(generics.ListCreateAPIView):
             total_projects=Count('projects', distinct=True)
         ).order_by('-created_at')
     def perform_create(self, serializer):
-        serializer.save(creator=self.request.user)
+        with transaction.atomic():
+            workspace=serializer.save(creator=self.request.user)
+            WorkspaceMember.objects.create(
+                workspace=workspace,
+                user=self.request.user,
+                role='owner',
+                is_active=True
+            )
     
 class WorkSpaceDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WorkspaceSerializer

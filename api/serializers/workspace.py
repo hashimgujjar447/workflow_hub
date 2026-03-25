@@ -39,6 +39,16 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'total_members',
             'total_projects'
         ]
+    def validate(self, data):
+        user = self.context['request'].user
+        name = data.get('name')
+
+        if Workspace.objects.filter(creator=user, name__iexact=name).exists():
+            raise serializers.ValidationError({
+                "name": "Workspace with this name already exists."
+            })
+
+        return data    
 
    
     

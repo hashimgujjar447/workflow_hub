@@ -72,6 +72,7 @@ class WorkspaceMember(models.Model):
 
     class Meta:
         unique_together = ('workspace', 'user')
+        
 
     def __str__(self):
         return f"{self.user.email} - {self.workspace.name} ({self.role})"

@@ -8,12 +8,16 @@ from api.views.project_task_details import RetrieveTaskApiView
 from api.views.profile import ProfileView
 
 from api.views.get_all_tasks import DashboardTasksView
+from api.views.invites import SendInviteView,ListInvitesView,HandleInviteView
 
 
 
 urlpatterns = [
     path('profile/',ProfileView.as_view()),
     path('workspaces/', ListCreateWorkspaceView.as_view()),
+    path('workspaces/<slug:slug>/invite/', SendInviteView.as_view()),
+    path('invites/', ListInvitesView.as_view()),
+    path('invites/action/', HandleInviteView.as_view()),
      path('dashboard_tasks/',DashboardTasksView.as_view() ),
     
     path('workspaces/<slug:workspace_slug>/', WorkSpaceDetailView.as_view()),
