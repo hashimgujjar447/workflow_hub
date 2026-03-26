@@ -9,6 +9,4 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectMember
         fields = ['member', 'member_detail', 'role', 'joined_at', 'is_active']
-        extra_kwargs = {
-            'member': {'write_only': True}
-        }
+      

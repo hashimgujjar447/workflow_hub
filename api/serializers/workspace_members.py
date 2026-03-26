@@ -9,6 +9,4 @@ class WorkSpaceMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkspaceMember
         fields = ['user', 'user_detail', 'role', 'joined_at', 'is_active']
-        extra_kwargs = {
-            'user': {'write_only': True}
-        }
+        
