@@ -11,14 +11,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 {"access": access},  # 👈 sirf access return karna
                 status=status.HTTP_200_OK,
             )
-            print("Refresh token",refresh)
+          
             res.set_cookie(
-                key="refresh_token",
+                 key="refresh_token",
                 value=refresh,
                 httponly=True,
-                secure=False,  # 🔥 production me True karna
+                secure=False,   # ⚠️ True in production
                 samesite="Lax",
-                max_age=7 * 24 * 60 * 60,  # 7 days
+                max_age=7 * 24 * 60 * 60,
+                path="/",
             )
             return res
         return response

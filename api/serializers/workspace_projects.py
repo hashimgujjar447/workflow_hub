@@ -22,7 +22,6 @@ class WorkSpaceProjectMembersSerializer(serializers.ModelSerializer):
 class WorkspaceProjectDetailSerializer(serializers.ModelSerializer):
     total_members = serializers.IntegerField(read_only=True)
     created_by = UserSerializer(read_only=True)
-    members = WorkSpaceProjectMembersSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
@@ -30,7 +29,7 @@ class WorkspaceProjectDetailSerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'created_at',
-            'members',
+         
             'total_members',
             'is_active',
             'created_by',

@@ -9,6 +9,7 @@ from api.views.profile import ProfileView
 
 from api.views.get_all_tasks import DashboardTasksView
 from api.views.invites import SendInviteView,ListInvitesView,HandleInviteView
+from api.views.auth import RegisterView,LoginView,LogoutView
 
 
 
@@ -34,5 +35,9 @@ urlpatterns = [
          ProjectMembersApiView.as_view()),
 path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/',ProjectTasksApiView.as_view()),
 path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/<int:pk>/',RetrieveTaskApiView.as_view()),
-path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/<int:pk>/comments/',TaskCommentsAPIView.as_view())
+path('workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/<int:pk>/comments/',TaskCommentsAPIView.as_view()),
+  path('auth/register/', RegisterView.as_view()),
+    path('auth/login/', LoginView.as_view()),
+    path('auth/logout/', LogoutView.as_view()),
+    path('auth/profile/', ProfileView.as_view()),
 ]
