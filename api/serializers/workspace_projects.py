@@ -16,7 +16,7 @@ class WorkSpaceProjectMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProjectMember
-        fields = ('member', 'role', 'is_active', 'joined_at')
+        fields = ('id','member', 'role', 'is_active', 'joined_at')
 
 
 class WorkspaceProjectDetailSerializer(serializers.ModelSerializer):

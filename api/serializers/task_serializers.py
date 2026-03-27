@@ -3,6 +3,7 @@ from tasks.models import Task
 from api.serializers.common_serializers import UserSerializer
 from api.serializers.workspace_projects import WorkSpaceProjectMembersSerializer
 from api.serializers.comment_serializer import CommentSerializer
+from projects.models import ProjectMember
 
 
 class ProjectTaskSerializer(serializers.ModelSerializer):
@@ -30,8 +31,14 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
         return CommentSerializer(top_level_comments, many=True).data
 
 
+
+
 class CreateTaskSerializer(serializers.ModelSerializer):
-    """Used for creating and updating tasks. assigned_to accepts ProjectMember pk."""
+    assigned_to = serializers.PrimaryKeyRelatedField(
+        queryset=ProjectMember.objects.all(),
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = Task

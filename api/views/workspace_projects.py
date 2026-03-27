@@ -81,7 +81,7 @@ class ProjectTasksApiView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         if self.request.method == "POST":
-            permission_classes = [permissions.IsAuthenticated, IsManagerOrLeader]
+            permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
