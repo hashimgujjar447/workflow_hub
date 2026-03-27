@@ -113,7 +113,7 @@ class ProjectTasksApiView(generics.ListCreateAPIView):
 
         return Response({
             "todo": grouped.get("todo", []),
-            "inprogress": grouped.get("inprogress", []),
+            "inprogress": grouped.get("in_progress", []),
             "failed": grouped.get("failed", []),
             "completed": grouped.get("completed", []),
         })

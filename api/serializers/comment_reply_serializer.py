@@ -14,7 +14,8 @@ class CommentDetailSerializer(serializers.ModelSerializer):
             'content',
             'author',
             'created_at',
-            'replies'
+            'replies',
+            'parent_comment'
         ]
 
     def get_replies(self, obj):
