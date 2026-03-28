@@ -28,13 +28,21 @@ class TaskCommentsAPIView(ListCreateAPIView):
             parent_comment__isnull=True
         ).select_related('author').prefetch_related(
             'replies',
-            'replies__author'
+            'replies__author',
+            'reactions',              # ✅ for likes/dislikes
+            'replies__reactions'      # ✅ nested replies reactions
         )
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CommentSerializer
         return CommentDetailSerializer
+
+    def get_serializer_context(self):
+        """Pass request to serializer (IMPORTANT for user_reaction)"""
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
     def perform_create(self, serializer):
         serializer.save(

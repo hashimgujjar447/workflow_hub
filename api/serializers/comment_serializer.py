@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from api.serializers.common_serializers import UserSerializer
-from comments.models import TaskComment
+from comments.models import TaskComment,CommentReaction
 from rest_framework.pagination import PageNumberPagination
+
 
 class CommentPagination(PageNumberPagination):
     page_size = 5
@@ -15,3 +16,10 @@ class CommentSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'parent_comment': {'required': False, 'allow_null': True}
         }
+
+
+class CommentReactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentReaction
+        fields = ['id', 'reaction']
+        read_only_fields = ['id']
