@@ -32,20 +32,28 @@ class WorkSpaceDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WorkspaceSerializer
     lookup_field = 'slug'
     lookup_url_kwarg='workspace_slug'
-    permission_classes = [permissions.IsAuthenticated,IsManager]   # ✅ sirf login user allowed
+       # ✅ sirf login user allowed
 
     def get_queryset(self):
-        return (
-            Workspace.objects
-            .annotate(
-                total_members=Count(
-                    'members',
-                    filter=Q(members__is_active=True),
-                    distinct=True
-                ),
-                total_projects=Count('projects', distinct=True)
-            )
+        return Workspace.objects.filter(
+            Q(creator=self.request.user) |
+            Q(members__user=self.request.user)
+        ).annotate(
+            total_members=Count(
+                'members',
+                filter=Q(members__is_active=True),
+                distinct=True
+            ),
+            total_projects=Count('projects', distinct=True)
         )
+    def get_permissions(self):
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            permission_classes = [IsManager]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+
+        return [permission() for permission in permission_classes]  
+        
     def perform_update(self, serializer):
         title = serializer.validated_data.get("name", serializer.instance.name)
         base_slug = slugify(title)

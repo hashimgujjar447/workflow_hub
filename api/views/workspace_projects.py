@@ -18,16 +18,29 @@ from api.serializers.task_serializers import (
     CreateTaskSerializer,
 )
 
-from api.permissions import IsManagerOrLeader
+from api.permissions import IsManagerOrLeader,IsManager
+
+
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from rest_framework import generics, permissions
+from projects.models import Project, ProjectMember
+from workspaces.models import Workspace
+from rest_framework.exceptions import PermissionDenied
+
 
 
 class WorkspaceProjectApiView(generics.ListCreateAPIView):
-    queryset = Project.objects.all()
     serializer_class = WorkspaceProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.IsAuthenticated(), IsManager()]
+        return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
         slug = self.kwargs['workspace_slug']
+
         return Project.objects.filter(
             workspace__slug=slug
         ).filter(
@@ -39,14 +52,17 @@ class WorkspaceProjectApiView(generics.ListCreateAPIView):
         workspace = get_object_or_404(
             Workspace, slug=self.kwargs["workspace_slug"]
         )
+
         project = serializer.save(
             workspace=workspace,
             created_by=self.request.user
         )
-        ProjectMember.objects.create(
+
+        # ✅ safe create (no duplicate crash)
+        ProjectMember.objects.get_or_create(
             project=project,
             member=self.request.user,
-            role=ProjectMember.ROLE_MANAGER
+            defaults={'role': ProjectMember.ROLE_MANAGER}
         )
 
 
@@ -80,23 +96,36 @@ class WorkspaceProjectDetailsApiView(generics.RetrieveUpdateDestroyAPIView):
 class ProjectTasksApiView(generics.ListCreateAPIView):
 
     def get_permissions(self):
-        if self.request.method == "POST":
-            permission_classes = [permissions.IsAuthenticated]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
+        return [permissions.IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateTaskSerializer
         return ProjectTaskSerializer
 
+    def get_project(self):
+        return get_object_or_404(
+            Project,
+            slug=self.kwargs["project_slug"],
+            workspace__slug=self.kwargs["workspace_slug"]
+        )
+
+    def is_project_member(self, project):
+        return ProjectMember.objects.filter(
+            project=project,
+            member=self.request.user,
+            is_active=True
+        ).exists()
+
     def get_queryset(self):
-        workspace_slug = self.kwargs["workspace_slug"]
-        project_slug = self.kwargs["project_slug"]
+        project = self.get_project()
+
+        # 🔐 ONLY project members can see tasks
+        if not self.is_project_member(project):
+            return Task.objects.none()
+
         return Task.objects.filter(
-            project__workspace__slug=workspace_slug,
-            project__slug=project_slug
+            project=project
         ).select_related(
             "project", "created_by", "assigned_to", "assigned_to__member"
         ).prefetch_related("comments")
@@ -119,16 +148,16 @@ class ProjectTasksApiView(generics.ListCreateAPIView):
         })
 
     def perform_create(self, serializer):
-        workspace_slug = self.kwargs["workspace_slug"]
-        project_slug = self.kwargs["project_slug"]
+        project = self.get_project()
 
-        project = get_object_or_404(
-            Project,
-            slug=project_slug,
-            workspace__slug=workspace_slug
+        # 🔐 ONLY project members can create tasks
+        if not self.is_project_member(project):
+            raise PermissionDenied("You are not a member of this project")
+
+        serializer.save(
+            project=project,
+            created_by=self.request.user
         )
-
-        serializer.save(project=project, created_by=self.request.user)
 
 
 class ProjectMembersApiView(generics.ListCreateAPIView):

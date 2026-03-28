@@ -15,6 +15,22 @@ class IsProjectMember(permissions.BasePermission):
             member=request.user,
             is_active=True
         ).exists()
+    def has_object_permission(self, request, view, obj):
+        # SAFE → allow
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # ✅ creator can edit
+        if obj.created_by == request.user:
+            return True
+
+        # ✅ manager / leader can edit
+        return ProjectMember.objects.filter(
+            project=obj.project,
+            member=request.user,
+            role__in=['manager', 'leader'],
+            is_active=True
+        ).exists()
 
 
 class IsManager(permissions.BasePermission):

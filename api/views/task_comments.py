@@ -5,16 +5,16 @@ from api.serializers.comment_reply_serializer import CommentDetailSerializer
 from api.serializers.comment_serializer import CommentSerializer, CommentPagination
 from rest_framework import permissions
 from api.permissions import IsProjectMember
-
+from django.shortcuts import get_object_or_404
 
 class TaskCommentsAPIView(ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsProjectMember]
     pagination_class = CommentPagination
 
     def get_task(self):
-        """Helper to fetch and cache task on the view instance."""
         if not hasattr(self, '_task'):
-            self._task = Task.objects.get(
+            self._task = get_object_or_404(
+                Task,
                 pk=self.kwargs['pk'],
                 project__workspace__slug=self.kwargs['workspace_slug'],
                 project__slug=self.kwargs['project_slug']
@@ -23,14 +23,15 @@ class TaskCommentsAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         task = self.get_task()
+
         return TaskComment.objects.filter(
             task=task,
             parent_comment__isnull=True
         ).select_related('author').prefetch_related(
             'replies',
             'replies__author',
-            'reactions',              # ✅ for likes/dislikes
-            'replies__reactions'      # ✅ nested replies reactions
+            'reactions',
+            'replies__reactions'
         )
 
     def get_serializer_class(self):
@@ -39,7 +40,6 @@ class TaskCommentsAPIView(ListCreateAPIView):
         return CommentDetailSerializer
 
     def get_serializer_context(self):
-        """Pass request to serializer (IMPORTANT for user_reaction)"""
         context = super().get_serializer_context()
         context['request'] = self.request
         return context

@@ -4,11 +4,10 @@ from api.serializers.common_serializers import UserSerializer
 
 
 class WorkspaceProjectSerializer(serializers.ModelSerializer):
-    slug = serializers.CharField(read_only=True)
-
     class Meta:
         model = Project
         fields = ('name', 'slug', 'created_at', 'is_active', 'status')
+        read_only_fields = ('slug', 'created_at', 'is_active', 'status')
 
 
 class WorkSpaceProjectMembersSerializer(serializers.ModelSerializer):
