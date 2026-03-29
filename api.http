@@ -3,17 +3,28 @@ POST http://127.0.0.1:8000/api/token/
 Content-Type: application/json
 
 {
-    "email":"hashim@example.com",
-    "password":"123456"
+    "email":"admin@example.com",
+    "password":"admin"
 }
 
 
 ###
 POST http://127.0.0.1:8000/api/workspaces/ 
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNjYwNzkwLCJpYXQiOjE3NzE2NjA0OTAsImp0aSI6IjE2MGU3MmM3ZmYwZjQ4NTE5YmYwNGI5MzU2MTNmYzlkIiwidXNlcl9pZCI6IjEifQ.r4Ja0ZVkB8niy76e6TuFjb5OGu6xa3bSVLAqKO2kXdo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc0ODAyODk0LCJpYXQiOjE3NzQ4MDI1OTQsImp0aSI6IjZiZDE3OGM2YjliMTRjOWI5MGVkZmU1ODE1OGUxZTE3IiwidXNlcl9pZCI6IjEifQ._MaJqVP6dc9OLAtFSw3W_99FD2eiF_5BnAOYWQ-b2kc
 
 {
     "name":"qasim kar"
 }
 
+###
+
+POST http://127.0.0.1:8000/api/workspaces/first-workspace-is-here-m/projects/10-pearls-shine/tasks/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc0ODAzMjMwLCJpYXQiOjE3NzQ4MDI5MzAsImp0aSI6ImJhYjcyM2UxYjc1ZTQ1NGViODZmMDIxN2ZkNWE0ZGRhIiwidXNlcl9pZCI6IjEifQ.uI0zPVsTXpbbRNDF6E9EOvKjMfWYzD2Klz1FUYNb3HA
+
+{
+  "title": "Realtime Test Task 🔥",
+  "description": "Testing websocket",
+  "status": "todo"
+}
