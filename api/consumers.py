@@ -11,3 +11,9 @@ class TaskConsumer(AsyncJsonWebsocketConsumer):
 
     async def task_update(self, event):
         await self.send_json(event["data"])
+
+    async def comment_update(self,event):
+        await self.send_json(event["data"])    
+        
+
+        

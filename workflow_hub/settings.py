@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
-    'comments',
     'projects',
     'workspaces',
     "debug_toolbar",
@@ -62,7 +61,8 @@ INSTALLED_APPS = [
       'api',
       'invitations',
        "corsheaders",
-        'tasks.apps.TasksConfig'
+        'tasks.apps.TasksConfig',
+        'comments.apps.CommentsConfig'
 ]
 
 MIDDLEWARE = [
