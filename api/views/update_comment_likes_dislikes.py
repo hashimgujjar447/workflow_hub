@@ -35,14 +35,16 @@ class CommentReactionView(generics.CreateAPIView):
         reaction_type = serializer.validated_data['reaction']
 
         obj, created = CommentReaction.objects.get_or_create(
-            user=user,
-            comment=comment
-        )
+        user=user,
+        comment=comment,
+        defaults={"reaction": reaction_type}   # 🔥 IMPORTANT
+    )
 
         # 🔁 Toggle logic
-        if not created and obj.reaction == reaction_type:
-            obj.delete()
-        else:
-            obj.reaction = reaction_type
-            obj.save()
-    
+        if not created:
+            if obj.reaction == reaction_type:
+                obj.delete()
+            else:
+                obj.reaction = reaction_type
+                obj.save()
+            

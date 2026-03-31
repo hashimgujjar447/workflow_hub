@@ -32,7 +32,7 @@ class TaskCommentsAPIView(ListCreateAPIView):
             'replies__author',
             'reactions',
             'replies__reactions'
-        )
+        ).order_by('-created_at')
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
