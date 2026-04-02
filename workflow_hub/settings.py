@@ -20,12 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^jrucv9yt2+(ehgns6job$s)ngrfwv3!=01w*_p@!h#yy#i*_!'
+SECRET_KEY = config("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -56,7 +57,6 @@ INSTALLED_APPS = [
     'accounts',
     'projects',
     'workspaces',
-    "debug_toolbar",
       'rest_framework',
       'api',
       'invitations',
@@ -67,7 +67,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
      "corsheaders.middleware.CorsMiddleware", 
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -113,9 +112,9 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'workflow_db',
-        'USER':'postgres',
-        'PASSWORD':'hashim123',
+        'NAME': config("DB_NAME"),
+        'USER':config("DB_USER"),
+        'PASSWORD':config("DB_PASSWORD"),
         'HOST':'localhost',
         'PORT':'5432'
     }

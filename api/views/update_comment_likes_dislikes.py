@@ -40,7 +40,7 @@ class CommentReactionView(generics.CreateAPIView):
         defaults={"reaction": reaction_type}   # 🔥 IMPORTANT
     )
 
-        # 🔁 Toggle logic
+       
         if not created:
             if obj.reaction == reaction_type:
                 obj.delete()
