@@ -7,7 +7,7 @@ from django.urls import path
 from api.views.project_task_details import RetrieveTaskApiView
 from api.views.profile import ProfileView
 
-from api.views.get_all_tasks import DashboardTasksView
+from api.views.get_all_tasks import DashboardTasksView,AllTasksView
 from api.views.invites import SendInviteView,ListInvitesView,HandleInviteView
 from api.views.auth import RegisterView,LoginView,LogoutView
 from api.views.update_comment_likes_dislikes import CommentReactionView
@@ -16,6 +16,7 @@ from api.views.update_comment_likes_dislikes import CommentReactionView
 
 urlpatterns = [
      path('profile/',ProfileView.as_view()),
+     path('tasks/',AllTasksView.as_view()),
      path('workspaces/', ListCreateWorkspaceView.as_view()),
      path('workspaces/<slug:slug>/invite/', SendInviteView.as_view()),
      path('invites/', ListInvitesView.as_view()),

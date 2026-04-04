@@ -26,7 +26,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['168.144.25.194',
+'workflowhub.duckdns.org',
+'www.workflowhub.duckdns.org']
 
 
 
@@ -66,7 +68,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-     "corsheaders.middleware.CorsMiddleware", 
+     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -172,14 +174,20 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
+
+    "https://workflowhub.duckdns.org"
+,
+"http://localhost:3000"
+,"https://workflowhub-seven.vercel.app"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+ "https://workflowhub.duckdns.org",
+    "http://workflowhub.duckdns.org" ,
+"http://localhost:3000"  ,
+"https://workflowhub-seven.vercel.app"
 ]
 # Debug Toolbar
 INTERNAL_IPS = [
@@ -187,7 +195,7 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
-    
+
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
