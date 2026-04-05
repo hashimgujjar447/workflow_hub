@@ -32,25 +32,38 @@ class DashboardTasksView(APIView):
             "my_tasks": DashboardTaskSerializer(my_tasks, many=True).data,
         })
 
+
 class AllTasksView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
 
-        tasks = Task.objects.filter(
+        # 🔒 Base queryset
+        base_qs = Task.objects.filter(
             project__workspace__members__user=user
         ).select_related(
             'project',
             'project__workspace',
             'assigned_to__member',
             'created_by'
-        ).distinct().order_by('-created_at')
+        ).distinct()
 
-        # 🔥 APPLY PAGINATION
-        paginator = TaskPagination()
-        paginated_tasks = paginator.paginate_queryset(tasks, request)
+     
+        my_tasks = base_qs.filter(
+            assigned_to__member=user
+        ).order_by('-created_at')
 
-        serializer = TaskSerializer(paginated_tasks, many=True)
+        recent_tasks = base_qs.order_by('-created_at')
 
-        return paginator.get_paginated_response(serializer.data)   
+    
+        my_tasks = my_tasks[:10]
+        recent_tasks = recent_tasks[:10]
+
+        return Response({
+            "count": base_qs.count(),
+
+            "my_tasks": TaskSerializer(my_tasks, many=True).data,
+
+            "recent_tasks": TaskSerializer(recent_tasks, many=True).data,
+        })

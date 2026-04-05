@@ -18,16 +18,11 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        user = serializer.save()
-
-        # 🔥 optional: auto login after register
-        refresh = RefreshToken.for_user(user)
+        serializer.save()
 
         return Response({
-            "message": "User registered successfully",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
+            "success": True,
+            "message": "User registered successfully"
         }, status=status.HTTP_201_CREATED)
 
 
@@ -79,7 +74,7 @@ class LogoutView(APIView):
         response.delete_cookie(
             key="refresh_token",
             path="/",
-            samesite="Lax",
+            samesite="None",
         )
 
         return response

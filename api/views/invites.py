@@ -1,15 +1,18 @@
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
-from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+import threading
+import uuid
 
 from workspaces.models import Workspace, WorkspaceMember
 from invitations.models import WorkspaceInvite
 from api.serializers.invitations import WorkspaceInviteSerializer
+from utils.email import send_invite_email
 
 
-# 🔥 1. SEND INVITE (CreateAPIView)
+# 🔥 1. SEND INVITE
 class SendInviteView(generics.CreateAPIView):
     serializer_class = WorkspaceInviteSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -39,36 +42,50 @@ class SendInviteView(generics.CreateAPIView):
         ).exists():
             return Response({"error": "User already a member"}, status=400)
 
-        # ✅ Duplicate invite check
-        if WorkspaceInvite.objects.filter(
+        # ✅ Check existing invite
+        old_invite = WorkspaceInvite.objects.filter(
             workspace=workspace,
             email=email,
             status="pending"
-        ).exists():
-            return Response({"error": "Invite already sent"}, status=400)
+        ).first()
 
-        # ✅ Create invite
-        invite = WorkspaceInvite.objects.create(
-            workspace=workspace,
-            invited_by=request.user,
-            email=email,
-            role=role
-        )
+        if old_invite:
+            if not old_invite.is_expired():
+                return Response(
+                    {"error": "Invite already sent. Please check email."},
+                    status=400
+                )
 
-        invite_link = f"http://localhost:3000/invites/{invite.token}"
+            # 🔥 Reuse expired invite instead of deleting
+            old_invite.token = uuid.uuid4()
+            old_invite.expires_at = timezone.now() + timedelta(days=7)
+            old_invite.invited_by = request.user
+            old_invite.role = role
+            old_invite.status = "pending"
+            old_invite.save()
 
-        send_mail(
-            subject=f"You are invited to join {workspace.name}",
-            message=f"Click to join: {invite_link}",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
+            invite = old_invite
+        else:
+            invite = WorkspaceInvite.objects.create(
+                workspace=workspace,
+                invited_by=request.user,
+                email=email,
+                role=role
+            )
+
+        invite_link = f"https://workflowhub-seven.vercel.app/invites/{invite.token}"
+
+        # 🔥 Async email (non-blocking)
+        threading.Thread(
+            target=send_invite_email,
+            args=(email, invite_link, workspace.name),
+            daemon=True
+        ).start()
 
         return Response({"message": "Invite sent successfully"}, status=201)
 
 
-# 🔥 2. LIST USER INVITES (ListAPIView)
+# 🔥 2. LIST USER INVITES
 class ListInvitesView(generics.ListAPIView):
     serializer_class = WorkspaceInviteSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -80,7 +97,7 @@ class ListInvitesView(generics.ListAPIView):
         ).order_by('-created_at')
 
 
-# 🔥 3. ACCEPT / REJECT INVITE (APIView style inside Generic)
+# 🔥 3. ACCEPT / REJECT INVITE
 class HandleInviteView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -120,4 +137,6 @@ class HandleInviteView(generics.GenericAPIView):
 
         invite.save()
 
-        return Response({"message": f"Invite {action}ed successfully"})
+        return Response({
+            "message": f"Invite {action}ed successfully"
+        })

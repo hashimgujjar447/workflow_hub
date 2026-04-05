@@ -31,17 +31,16 @@ ALLOWED_HOSTS = ['168.144.25.194',
 'www.workflowhub.duckdns.org']
 
 
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = "smtp.resend.com"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "resend"
-EMAIL_HOST_PASSWORD = config("RESEND_API_KEY")
+EMAIL_HOST_USER = "hashimgujjarge447@gmail.com"
+EMAIL_HOST_PASSWORD = config("APP_PASSWORD")  
 
-DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
+DEFAULT_FROM_EMAIL = "WorkflowHub <hashimgujjarge447@gmail.com>"
 
 # Application definition
 
@@ -114,9 +113,9 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config("DB_NAME"),
-        'USER':config("DB_USER"),
-        'PASSWORD':config("DB_PASSWORD"),
+        'NAME': config('DB_NAME'),
+        'USER':config('DB_USER'),
+        'PASSWORD':config('DB_PASSWORD'),
         'HOST':'localhost',
         'PORT':'5432'
     }
@@ -176,17 +175,14 @@ LOGOUT_REDIRECT_URL = 'login'
 CSRF_TRUSTED_ORIGINS = [
 
     "https://workflowhub.duckdns.org"
-,
-"http://localhost:3000"
 ,"https://workflowhub-seven.vercel.app"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
- "https://workflowhub.duckdns.org",
-    "http://workflowhub.duckdns.org" ,
-"http://localhost:3000"  ,
+"https://workflowhub.duckdns.org",
+"http://workflowhub.duckdns.org" ,
 "https://workflowhub-seven.vercel.app"
 ]
 # Debug Toolbar
