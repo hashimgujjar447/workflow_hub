@@ -28,19 +28,10 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['168.144.25.194',
 'workflowhub.duckdns.org',
-'www.workflowhub.duckdns.org']
+'www.workflowhub.duckdns.org','www.workflowhub.me','workflowhub.me']
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = "hashimgujjarge447@gmail.com"
-EMAIL_HOST_PASSWORD = config("APP_PASSWORD")  
-
-DEFAULT_FROM_EMAIL = "WorkflowHub <hashimgujjarge447@gmail.com>"
+DEFAULT_FROM_EMAIL = "WorkflowHub <noreply@workflowhub.me>"
 
 # Application definition
 
@@ -175,7 +166,8 @@ LOGOUT_REDIRECT_URL = 'login'
 CSRF_TRUSTED_ORIGINS = [
 
     "https://workflowhub.duckdns.org"
-,"https://workflowhub-seven.vercel.app"
+,"https://workflowhub-seven.vercel.app",
+'https://www.workflowhub.me'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -183,7 +175,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
 "https://workflowhub.duckdns.org",
 "http://workflowhub.duckdns.org" ,
-"https://workflowhub-seven.vercel.app"
+"https://workflowhub-seven.vercel.app",
+'https://www.workflowhub.me'
 ]
 # Debug Toolbar
 INTERNAL_IPS = [
@@ -200,3 +193,14 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
+
+# ================= CELERY CONFIG =================
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+
+CELERY_TIMEZONE = "UTC"

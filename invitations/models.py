@@ -58,6 +58,5 @@ class WorkspaceInvite(models.Model):
         if not self.expires_at:
             self.expires_at=timezone.now() + timedelta(days=7)
         super().save(*args,**kwargs)    
-    class Meta:
-            unique_together = ("workspace", "email")    
+   
         

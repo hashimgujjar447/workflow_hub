@@ -6,11 +6,12 @@ from datetime import timedelta
 import threading
 import uuid
 
+
 from workspaces.models import Workspace, WorkspaceMember
 from invitations.models import WorkspaceInvite
 from api.serializers.invitations import WorkspaceInviteSerializer
 from utils.email import send_invite_email
-
+from invitations.tasks import send_invite_email_task
 
 # 🔥 1. SEND INVITE
 class SendInviteView(generics.CreateAPIView):
@@ -75,12 +76,7 @@ class SendInviteView(generics.CreateAPIView):
 
         invite_link = f"https://workflowhub-seven.vercel.app/invites/{invite.token}"
 
-        # 🔥 Async email (non-blocking)
-        threading.Thread(
-            target=send_invite_email,
-            args=(email, invite_link, workspace.name),
-            daemon=True
-        ).start()
+        send_invite_email_task.delay(email, invite_link, workspace.name)
 
         return Response({"message": "Invite sent successfully"}, status=201)
 

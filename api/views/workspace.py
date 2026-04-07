@@ -24,7 +24,7 @@ class ListCreateWorkspaceView(generics.ListCreateAPIView):
             WorkspaceMember.objects.create(
                 workspace=workspace,
                 user=self.request.user,
-                role='owner',
+                role='manager',
                 is_active=True
             )
     
