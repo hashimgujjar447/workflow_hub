@@ -40,12 +40,24 @@ class WorkspaceProjectApiView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         slug = self.kwargs['workspace_slug']
+        user = self.request.user
 
+        workspace = get_object_or_404(Workspace, slug=slug)
+
+     
+        if workspace.creator == user:
+            return Project.objects.filter(workspace=workspace)
+
+       
+        workspace_member = workspace.members.filter(user=user).first()
+
+        if workspace_member and workspace_member.role in ["manager", "leader"]:
+            return Project.objects.filter(workspace=workspace)
+      
         return Project.objects.filter(
-            workspace__slug=slug
-        ).filter(
-            Q(workspace__creator=self.request.user) |
-            Q(workspace__members__user=self.request.user)
+            workspace=workspace,
+            members__member=user,  # 👈 IMPORTANT
+            members__is_active=True
         ).distinct()
 
     def perform_create(self, serializer):

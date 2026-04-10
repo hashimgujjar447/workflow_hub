@@ -71,6 +71,15 @@ class DashboardTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source='project.name', read_only=True)
     workspace_name = serializers.CharField(source='project.workspace.name', read_only=True)
+    workspace_slug = serializers.CharField(
+    source="project.workspace.slug",
+    read_only=True
+)
+
+    project_slug = serializers.CharField(
+        source="project.slug",
+        read_only=True
+    )
 
     assigned_to = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
@@ -90,6 +99,8 @@ class TaskSerializer(serializers.ModelSerializer):
             # relations
             'project_name',
             'workspace_name',
+            'project_slug',
+            'workspace_slug',
             'assigned_to',
             'created_by',
         ]

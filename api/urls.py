@@ -11,6 +11,7 @@ from api.views.get_all_tasks import DashboardTasksView,AllTasksView
 from api.views.invites import SendInviteView,ListInvitesView,HandleInviteView
 from api.views.auth import RegisterView,LoginView,LogoutView
 from api.views.update_comment_likes_dislikes import CommentReactionView
+from api.views.user_stats import UserStatsView
 
 
 
@@ -42,6 +43,7 @@ urlpatterns = [
     'workspaces/<slug:workspace_slug>/projects/<slug:project_slug>/tasks/<int:task_id>/comments/<int:comment_id>/reaction/',
     CommentReactionView.as_view()
 ),
+   path("user/stats/", UserStatsView.as_view()),
      path('auth/register/', RegisterView.as_view()),
      path('auth/login/', LoginView.as_view()),
      path('auth/logout/', LogoutView.as_view()),

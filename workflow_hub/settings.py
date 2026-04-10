@@ -24,11 +24,11 @@ SECRET_KEY = config("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['168.144.25.194',
 'workflowhub.duckdns.org',
-'www.workflowhub.duckdns.org','www.workflowhub.me','workflowhub.me']
+'www.workflowhub.duckdns.org','www.workflowhub.me','workflowhub.me','localhost','127.0.0.1']
 
 
 DEFAULT_FROM_EMAIL = "WorkflowHub <noreply@workflowhub.me>"
@@ -104,9 +104,9 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER':config('DB_USER'),
-        'PASSWORD':config('DB_PASSWORD'),
+        'NAME': 'workflow_db',
+        'USER':'postgres',
+        'PASSWORD':'hashim123',
         'HOST':'localhost',
         'PORT':'5432'
     }
@@ -167,7 +167,8 @@ CSRF_TRUSTED_ORIGINS = [
 
     "https://workflowhub.duckdns.org"
 ,"https://workflowhub-seven.vercel.app",
-'https://www.workflowhub.me'
+'https://www.workflowhub.me',
+'http://localhost:3000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -176,7 +177,8 @@ CORS_ALLOWED_ORIGINS = [
 "https://workflowhub.duckdns.org",
 "http://workflowhub.duckdns.org" ,
 "https://workflowhub-seven.vercel.app",
-'https://www.workflowhub.me'
+'https://www.workflowhub.me',
+'http://localhost:3000'
 ]
 # Debug Toolbar
 INTERNAL_IPS = [
